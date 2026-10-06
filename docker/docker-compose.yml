@@ -1,0 +1,42 @@
+services:
+  joomla:
+    image: joomla:5-php8.3-apache
+    container_name: cyonima-joomla
+    ports:
+      - "8080:80"
+    environment:
+      JOOMLA_DB_HOST: db
+      JOOMLA_DB_USER: cyonima
+      JOOMLA_DB_PASSWORD: cyonima
+      JOOMLA_DB_NAME: joomla
+      JOOMLA_DB_TYPE: mysqli
+      JOOMLA_SITE_NAME: "Cyonima LMS - Test"
+      JOOMLA_ADMIN_USER: admin
+      JOOMLA_ADMIN_PASSWORD: "Cyonima2026!"
+      JOOMLA_ADMIN_EMAIL: admin@example.com
+    volumes:
+      - ..:/cyonima:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11
+    container_name: cyonima-db
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: joomla
+      MARIADB_USER: cyonima
+      MARIADB_PASSWORD: cyonima
+    volumes:
+      - cyonima_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  cyonima_db:

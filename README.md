@@ -62,6 +62,46 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 
 ---
 
+## Environnement de test (Docker)
+
+Un environnement reproductible est fourni dans `docker/` (Joomla 5 + MariaDB).
+
+```bash
+# 1. Une seule fois : autoriser Docker pour votre utilisateur (puis re-login)
+sudo usermod -aG docker $USER
+
+# 2. Démarrer l'environnement + installer Joomla + installer com_cyonima
+./docker/up.sh
+```
+
+Résultat :
+
+| Élément    | Valeur                                        |
+|------------|-----------------------------------------------|
+| Frontend   | http://localhost:8080/                         |
+| Admin      | http://localhost:8080/administrator            |
+| Admin user | `admin`                                        |
+| Password   | `Cyonima2026!`                                 |
+
+Commandes utiles :
+
+```bash
+docker compose -f docker/docker-compose.yml logs -f joomla   # logs
+docker compose -f docker/docker-compose.yml down             # arrêter
+docker compose -f docker/docker-compose.yml down -v          # tout réinitialiser
+```
+
+Fichiers :
+
+- `docker/docker-compose.yml` — services `joomla` + `mariadb`, source montée en `/cyonima`.
+- `docker/up.sh` — orchestration complète (démarrage, install Joomla via CLI, install du composant).
+- `docker/install-component.php` — installe `com_cyonima` depuis le dossier monté et vérifie (tables, groupes).
+- `docker/cleanup.php` — réinitialise l'état (tables, extension, asset, menus, fichiers) avant réinstallation.
+
+> Note : le script `up.sh` installe Joomla via son CLI (`installation/joomla.php install`) car l'auto-installation du conteneur officiel n'est pas déclenchée. L'installation du composant neutralise temporairement les plugins d'extension (`finder`, `joomla`, `joomlaupdate`) non autochargeables en CLI, puis les restaure.
+
+---
+
 ## Rôles et permissions
 
 Deux groupes utilisateurs sont créés et délégués à l'administration des comptes Joomla :

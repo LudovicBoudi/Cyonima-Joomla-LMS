@@ -8,6 +8,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -51,7 +52,7 @@ $item = $this->item;
 		<div class="control-group">
 			<label class="control-label" for="jform_content"><?php echo Text::_('COM_CYONIMA_CONTENT'); ?></label>
 			<div class="controls">
-				<?php echo HTMLHelper::_('editor', $item->content ?? '', 'jform[content]', ['id' => 'jform_content', 'width' => '100%', 'height' => '300px']); ?>
+				<?php echo Editor::getInstance()->display('jform[content]', $item->content ?? '', '100%', '300px', 60, 20); ?>
 			</div>
 		</div>
 		<div class="control-group">
@@ -101,7 +102,7 @@ $item = $this->item;
 		<div class="control-group">
 			<label class="control-label" for="jform_access"><?php echo Text::_('JFIELD_ACCESS_LABEL'); ?></label>
 			<div class="controls">
-				<?php echo HTMLHelper::_('access.assetgroups', 'jform[access]', $item->access ?? 1, false); ?>
+				<?php echo HTMLHelper::_('access.assetgrouplist', 'jform[access]', $item->access ?? 1, 'class="form-select"'); ?>
 			</div>
 		</div>
 	</fieldset>

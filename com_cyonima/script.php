@@ -42,10 +42,7 @@ class com_cyonimaInstallerScript
 	 */
 	public function postflight($type, $parent): bool
 	{
-		if ($type !== 'install' && $type !== 'discover_install') {
-			return true;
-		}
-
+		// Idempotent setup: safe to run on install, update and discover_install.
 		$this->createUserGroup(self::GROUP_TEACHER);
 		$this->createUserGroup(self::GROUP_STUDENT);
 		$this->setDefaultAcl();
@@ -93,8 +90,7 @@ class com_cyonimaInstallerScript
 			$db->getQuery(true)
 				->select($db->quoteName('id'))
 				->from($db->quoteName('#__usergroups'))
-				->where($db->quoteName('title') . ' = :title')
-				->bind(':title', 'Registered')
+				->where($db->quoteName('title') . ' = ' . $db->quote('Registered'))
 		)->loadResult();
 
 		$group           = new Usergroup($db);
@@ -150,8 +146,7 @@ class com_cyonimaInstallerScript
 			$db->getQuery(true)
 				->select($db->quoteName('id'))
 				->from($db->quoteName('#__assets'))
-				->where($db->quoteName('name') . ' = :name')
-				->bind(':name', 'com_cyonima')
+				->where($db->quoteName('name') . ' = ' . $db->quote('com_cyonima'))
 		)->loadResult();
 
 		if (!$assetId) {
@@ -166,29 +161,30 @@ class com_cyonimaInstallerScript
 		)->loadResult());
 
 		if ($teacherId) {
-			$rules->allow('core.manage', [$teacherId]);
-			$rules->allow('core.create', [$teacherId]);
-			$rules->allow('core.edit', [$teacherId]);
-			$rules->allow('core.edit.state', [$teacherId]);
-			$rules->allow('core.delete', [$teacherId]);
-			$rules->allow('course.teach', [$teacherId]);
-			$rules->allow('grade.submission', [$teacherId]);
+			foreach ([
+				'core.manage', 'core.create', 'core.edit', 'core.edit.state',
+				'core.delete', 'course.teach', 'grade.submission',
+			] as $action) {
+				$rules->mergeAction($action, [$teacherId => true]);
+			}
 		}
 
 		if ($studentId) {
-			$rules->allow('course.enroll', [$studentId]);
+			$rules->mergeAction('course.enroll', [$studentId => true]);
 		}
 
 		// Any logged-in user can enroll by default.
 		$registeredId = $this->getGroupId('Registered');
-		$rules->allow('course.enroll', [$registeredId ?: 2]);
+		$rules->mergeAction('course.enroll', [($registeredId ?: 2) => true]);
+
+		$rulesJson = (string) $rules;
 
 		$db->setQuery(
 			$db->getQuery(true)
 				->update($db->quoteName('#__assets'))
 				->set($db->quoteName('rules') . ' = :rules')
 				->where($db->quoteName('id') . ' = ' . $assetId)
-				->bind(':rules', (string) $rules)
+				->bind(':rules', $rulesJson)
 		)->execute();
 	}
 

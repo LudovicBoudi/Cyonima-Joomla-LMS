@@ -57,19 +57,24 @@ class LearningpathTable extends Table
 	public function store($updateNulls = true)
 	{
 		$date = Factory::getDate();
-		$user = Factory::getApplication()->getIdentity();
+		$user   = Factory::getApplication()->getIdentity();
+		$userId = $user ? (int) $user->id : 0;
+		$now    = $date->toSql();
 
 		if ($this->id) {
-			$this->modified    = $date->toSql();
-			$this->modified_by = (int) $user->id;
+			$this->modified    = $now;
+			$this->modified_by = $userId;
 		} else {
 			if (!(int) $this->created) {
-				$this->created = $date->toSql();
+				$this->created = $now;
 			}
 
 			if (empty($this->created_by)) {
-				$this->created_by = (int) $user->id;
+				$this->created_by = $userId;
 			}
+
+			$this->modified    = $now;
+			$this->modified_by = $userId;
 		}
 
 		return parent::store($updateNulls);

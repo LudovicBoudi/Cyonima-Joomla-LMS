@@ -49,8 +49,9 @@ class CertificatetemplateTable extends Table
 
 	public function store($updateNulls = true)
 	{
-		$date = Factory::getDate();
-		$user = Factory::getApplication()->getIdentity();
+		$date   = Factory::getDate();
+		$user   = Factory::getApplication()->getIdentity();
+		$userId = $user ? (int) $user->id : 0;
 
 		if ($this->id) {
 			// Nothing to update on edit timestamp-wise.
@@ -60,7 +61,7 @@ class CertificatetemplateTable extends Table
 			}
 
 			if (empty($this->user_id)) {
-				$this->user_id = (int) $user->id;
+				$this->user_id = $userId;
 			}
 		}
 
