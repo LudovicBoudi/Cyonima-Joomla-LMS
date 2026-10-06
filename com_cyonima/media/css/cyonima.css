@@ -1,0 +1,134 @@
+.cyonima {
+	line-height: 1.6;
+}
+
+.cyonima h1 {
+	margin-bottom: 1rem;
+}
+
+.cyonima-muted {
+	color: #6c757d;
+	font-size: 0.9rem;
+}
+
+.cyonima-intro {
+	font-size: 1.1rem;
+	margin-bottom: 1rem;
+}
+
+/* Course catalogue grid */
+.cyonima-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 1.5rem;
+}
+
+.cyonima-card {
+	border: 1px solid #e3e3e3;
+	border-radius: 8px;
+	overflow: hidden;
+	background: #fff;
+}
+
+.cyonima-card__image img {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+	display: block;
+}
+
+.cyonima-card__body {
+	padding: 1rem;
+}
+
+.cyonima-card__body h3 {
+	margin: 0 0 0.5rem;
+}
+
+/* Course lessons list */
+.cyonima-lessons {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.cyonima-lesson {
+	border-bottom: 1px solid #eee;
+}
+
+.cyonima-lesson a {
+	display: flex;
+	gap: 0.75rem;
+	padding: 0.75rem 0.5rem;
+	text-decoration: none;
+	align-items: center;
+}
+
+.cyonima-lesson.is-completed .cyonima-lesson__title {
+	text-decoration: line-through;
+	opacity: 0.7;
+}
+
+.cyonima-lesson__type {
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	padding: 0.15rem 0.5rem;
+	background: #eee;
+	border-radius: 4px;
+}
+
+/* Player */
+.cyonima-video video,
+.cyonima-embed iframe {
+	max-width: 100%;
+}
+
+.cyonima-embed {
+	position: relative;
+	padding-bottom: 56.25%;
+	height: 0;
+	overflow: hidden;
+}
+
+.cyonima-embed iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+/* Exams */
+.cyonima-question {
+	border: 1px solid #e3e3e3;
+	border-radius: 8px;
+	padding: 1rem;
+	margin-bottom: 1rem;
+}
+
+.cyonima-question legend {
+	font-weight: 600;
+	padding: 0 0.5rem;
+}
+
+/* Progress bar */
+.cyonima .progress {
+	background: #e9ecef;
+	border-radius: 4px;
+	overflow: hidden;
+	height: 1rem;
+}
+
+.cyonima .progress-bar {
+	background: #28a745;
+	height: 100%;
+}
+
+/* Learning paths */
+.cyonima-path-courses {
+	padding-left: 1.25rem;
+}
+
+.cyonima-path-courses li {
+	margin-bottom: 0.5rem;
+}

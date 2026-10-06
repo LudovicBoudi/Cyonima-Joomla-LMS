@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+	<name>COM_CYONIMA</name>
+	<creationDate>2026-10-06</creationDate>
+	<author>Cyonima</author>
+	<authorEmail>contact@cyonima.example</authorEmail>
+	<authorUrl>https://cyonima.example</authorUrl>
+	<copyright>(C) 2026 Cyonima. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>1.0.0</version>
+	<description>COM_CYONIMA_XML_DESCRIPTION</description>
+
+	<namespace path="src">Cyonima\Component\Cyonima</namespace>
+
+	<scriptfile>script.php</scriptfile>
+
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+
+	<administration>
+		<menu img="class:book">COM_CYONIMA</menu>
+		<submenu>
+			<menu link="option=com_cyonima&amp;view=courses">COM_CYONIMA_SUBMENU_COURSES</menu>
+			<menu link="option=com_cyonima&amp;view=lessons">COM_CYONIMA_SUBMENU_LESSONS</menu>
+			<menu link="option=com_cyonima&amp;view=assignments">COM_CYONIMA_SUBMENU_ASSIGNMENTS</menu>
+			<menu link="option=com_cyonima&amp;view=submissions">COM_CYONIMA_SUBMENU_SUBMISSIONS</menu>
+			<menu link="option=com_cyonima&amp;view=exams">COM_CYONIMA_SUBMENU_EXAMS</menu>
+			<menu link="option=com_cyonima&amp;view=learningpaths">COM_CYONIMA_SUBMENU_LEARNINGPATHS</menu>
+			<menu link="option=com_cyonima&amp;view=certificatetemplates">COM_CYONIMA_SUBMENU_CERTIFICATETEMPLATES</menu>
+			<menu link="option=com_cyonima&amp;view=certificates">COM_CYONIMA_SUBMENU_CERTIFICATES</menu>
+			<menu link="option=com_cyonima&amp;view=enrollments">COM_CYONIMA_SUBMENU_ENROLLMENTS</menu>
+		</submenu>
+
+		<files folder="admin">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<folder>services</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+			<folder>sql</folder>
+			<folder>language</folder>
+		</files>
+	</administration>
+
+	<files folder="site">
+		<folder>services</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+		<folder>language</folder>
+	</files>
+
+	<media destination="com_cyonima" folder="media">
+		<folder>css</folder>
+		<folder>js</folder>
+		<folder>images</folder>
+	</media>
+</extension>

@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS `#__cyonima_learning_path_courses`;
+DROP TABLE IF EXISTS `#__cyonima_learning_paths`;
+DROP TABLE IF EXISTS `#__cyonima_certificates`;
+DROP TABLE IF EXISTS `#__cyonima_certificate_templates`;
+DROP TABLE IF EXISTS `#__cyonima_exam_attempts`;
+DROP TABLE IF EXISTS `#__cyonima_questions`;
+DROP TABLE IF EXISTS `#__cyonima_exams`;
+DROP TABLE IF EXISTS `#__cyonima_submissions`;
+DROP TABLE IF EXISTS `#__cyonima_assignments`;
+DROP TABLE IF EXISTS `#__cyonima_lesson_progress`;
+DROP TABLE IF EXISTS `#__cyonima_enrollments`;
+DROP TABLE IF EXISTS `#__cyonima_lessons`;
+DROP TABLE IF EXISTS `#__cyonima_courses`;
