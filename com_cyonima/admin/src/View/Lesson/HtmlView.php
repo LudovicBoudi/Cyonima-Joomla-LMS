@@ -25,7 +25,13 @@ class HtmlView extends BaseHtmlView
 	public function display($tpl = null)
 	{
 		$model = $this->getModel();
-		$model->setState('lesson.id', Factory::getApplication()->input->getInt('id'));
+		$input = Factory::getApplication()->input;
+
+		$model->setState('lesson.id', $input->getInt('id'));
+
+		if (!$input->getInt('id')) {
+			$model->setState('lesson.course_id', $input->getInt('course_id'));
+		}
 
 		$this->item = $model->getItem();
 

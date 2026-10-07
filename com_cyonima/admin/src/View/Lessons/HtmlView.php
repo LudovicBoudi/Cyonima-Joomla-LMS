@@ -12,6 +12,7 @@ namespace Cyonima\Component\Cyonima\Administrator\View\Lessons;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 /**
@@ -39,7 +40,17 @@ class HtmlView extends BaseHtmlView
 	protected function addToolbar()
 	{
 		ToolbarHelper::title(Text::_('COM_CYONIMA_LESSONS'), 'list');
-		ToolbarHelper::addNew('lessons.add');
+
+		$courseId = (int) ($this->state->get('filter.course') ?: 0);
+
+		if ($courseId) {
+			ToolbarHelper::link(
+				Route::_('index.php?option=com_cyonima&view=lesson&layout=edit&course_id=' . $courseId),
+				'JTOOLBAR_NEW'
+			);
+		} else {
+			ToolbarHelper::addNew('lessons.add');
+		}
 		ToolbarHelper::editList('lessons.edit');
 		ToolbarHelper::publish('lessons.publish', 'JTOOLBAR_PUBLISH', true);
 		ToolbarHelper::unpublish('lessons.unpublish', 'JTOOLBAR_UNPUBLISH', true);

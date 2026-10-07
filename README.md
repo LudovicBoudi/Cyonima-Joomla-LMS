@@ -152,7 +152,7 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
 ## Utilisation côté teacher
 
 1. **Créer un cours** : Composants → Cyonima LMS → Courses → New (titre, description, image, statut).
-2. **Ajouter des leçons** : dans la liste des cours, lien « Lessons », ou menu Lessons. Choisir le type de leçon :
+2. **Ajouter des leçons** : depuis la liste des cours (lien « Lessons »), depuis la fiche d'un cours enregistré (lien **« Manage lessons »**, qui ouvre la liste filtrée sur ce cours), ou via le menu Lessons. Le bouton « New » d'une liste filtrée ouvre la fiche leçon avec le cours déjà sélectionné. Choisir le type de leçon :
    - `content` : contenu HTML ;
    - `video` : fichier vidéo (MP4) ou URL d'iframe (YouTube, Vimeo…) ;
    - `pdf` : chemin du fichier PDF ;

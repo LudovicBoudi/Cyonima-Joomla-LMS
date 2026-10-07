@@ -44,6 +44,18 @@ $item = $this->item;
 		</div>
 		<div class="col-md-4">
 			<fieldset class="options-form">
+				<?php if (!empty($item->id)) : ?>
+					<div class="control-group">
+						<label class="control-label"><?php echo Text::_('COM_CYONIMA_LESSONS'); ?></label>
+						<div class="controls">
+							<p class="form-control-plaintext">
+								<a href="<?php echo Route::_('index.php?option=com_cyonima&view=lessons&filter_course=' . (int) $item->id); ?>">
+									<?php echo Text::_('COM_CYONIMA_MANAGE_LESSONS'); ?>
+								</a>
+							</p>
+						</div>
+					</div>
+				<?php endif; ?>
 				<div class="control-group">
 					<label class="control-label" for="jform_published"><?php echo Text::_('JSTATUS'); ?></label>
 					<div class="controls">

@@ -24,7 +24,7 @@ class LessonModel extends BaseDatabaseModel
 		if (!$id) {
 			return (object) [
 				'id'          => 0,
-				'course_id'   => 0,
+				'course_id'   => (int) $this->getState('lesson.course_id'),
 				'title'       => '',
 				'type'        => 'content',
 				'published'   => 1,
