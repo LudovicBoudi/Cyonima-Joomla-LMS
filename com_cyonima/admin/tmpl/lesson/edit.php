@@ -8,6 +8,7 @@
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Helper\CyonimaHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -66,8 +67,7 @@ $item = $this->item;
 		<div class="control-group">
 			<label class="control-label" for="jform_media"><?php echo Text::_('COM_CYONIMA_MEDIA'); ?></label>
 			<div class="controls">
-				<input type="text" name="jform[media]" id="jform_media" class="form-control"
-					value="<?php echo $this->escape($item->media ?? ''); ?>">
+				<?php echo CyonimaHelper::mediaField('jform[media]', $item->media ?? '', 'jform_media'); ?>
 			</div>
 		</div>
 		<div class="control-group">
