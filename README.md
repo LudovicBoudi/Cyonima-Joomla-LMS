@@ -27,6 +27,7 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 ## Fonctionnalités
 
 - **Cours** avec description riche, image, publication, accès et langue.
+- **Curriculum structuré** : un cours se compose de **sections** ordonnées ; le teacher crée les leçons, devoirs et examens directement depuis la page « Curriculum » du cours, les réordonne, les renomme et les supprime. Le contenu s'affiche côté student **regroupé par section**.
 - **Leçons** de 6 types : contenu riche (`content`), vidéo (`video`), PDF (`pdf`), lien externe (`link`), devoir (`assignment`) et examen (`exam`).
 - **Devoirs QCM notés automatiquement** : questions à choix unique, multiples ou vrai/faux, points par question, coefficient, nombre de tentatives autorisées.
 - **Examens formels** : mêmes types de questions, barème, note de passage, temps limite, coefficient, nombre de tentatives, mélange des questions.
@@ -152,24 +153,30 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
 ## Utilisation côté teacher
 
 1. **Créer un cours** : Composants → Cyonima LMS → Courses → New (titre, description, image, statut).
-2. **Ajouter des leçons** : depuis la liste des cours (lien « Lessons »), depuis la fiche d'un cours enregistré (lien **« Manage lessons »**, qui ouvre la liste filtrée sur ce cours), ou via le menu Lessons. Le bouton « New » d'une liste filtrée ouvre la fiche leçon avec le cours déjà sélectionné. Choisir le type de leçon :
+2. **Concevoir le curriculum** : depuis la fiche du cours ou la liste des cours, lien **« Curriculum »**. Créer des **sections** (titre éditable, ↑/↓, suppression), puis ajouter dans chaque section le contenu voulu :
+   - une leçon (`content`, `video`, `pdf`, `link`) ;
+   - un devoir : la leçon **et** la fiche `assignment` sont créées en une étape (leçon de type `assignment` déjà reliée) ;
+   - un examen : idem avec la fiche `exam`.
+   Chaque item se déplace (↑/↓), s'édite et se supprime (suppression en cascade de la leçon, du devoir/examen, de ses questions et tentatives). Supprimer une section fait repasser ses contenus dans « No section » — aucune leçon n'est supprimée. Les leçons créées avant l'ajout de sections se retrouvent aussi dans « No section ».
+3. **Ajouter des leçons** : depuis la liste des cours (lien « Lessons »), depuis la fiche d'un cours enregistré (lien **« Manage lessons »**, qui ouvre la liste filtrée sur ce cours), ou via le menu Lessons. Le bouton « New » d'une liste filtrée ouvre la fiche leçon avec le cours déjà sélectionné. Choisir le type de leçon :
    - `content` : contenu HTML ;
    - `video` : fichier vidéo (MP4) ou URL d'iframe (YouTube, Vimeo…) ;
    - `pdf` : chemin du fichier PDF ;
    - `link` : lien externe ;
    - `assignment` : à relier à un devoir (menu Assignments) ;
    - `exam` : à relier à un examen (menu Exams).
-3. **Devoirs** : Composants → Assignments (description, date limite, barème, **coefficient**, **tentatives autorisées**). Ajouter ensuite les **Questions** (lien « Questions » ou « Manage questions » depuis la fiche) : single / multiple / truefalse, points par question, bonne réponse cochée.
-4. **Examens** : Composants → Exams (note de passage, temps, tentatives, **coefficient**, mélange), puis ajouter des **Questions**.
-5. **Monitoring** : depuis la liste des cours, lien « Monitor » → élèves inscrits, progression, **note globale**, résultats détaillés avec le coefficient de chaque devoir/examen.
-6. **Learning paths** : Composants → Learning Paths (regrouper des cours dans un ordre).
-7. **Certificat** : Composants → Certificate Templates, uploader une image JPEG/PNG et définir les positions des textes (voir section dédiée).
+4. **Devoirs** : Composants → Assignments (description, date limite, barème, **coefficient**, **tentatives autorisées**). Ajouter ensuite les **Questions** (lien « Questions » ou « Manage questions » depuis la fiche) : single / multiple / truefalse, points par question, bonne réponse cochée.
+5. **Examens** : Composants → Exams (note de passage, temps, tentatives, **coefficient**, mélange), puis ajouter des **Questions**.
+6. **Monitoring** : depuis la liste des cours, lien « Monitor » → élèves inscrits, progression, **note globale**, résultats détaillés avec le coefficient de chaque devoir/examen.
+7. **Learning paths** : Composants → Learning Paths (regrouper des cours dans un ordre).
+8. **Certificat** : Composants → Certificate Templates, uploader une image JPEG/PNG et définir les positions des textes (voir section dédiée).
 
 ---
 
 ## Utilisation côté student
 
 - **S'inscrire** à un cours depuis le catalogue (bouton « Enroll »).
+- **Consulter** le contenu de la formation **regroupé par section** (les leçons sans section sont listées en premier).
 - **Suivre** les leçons et marquer la complétion (« Mark as complete »).
 - **Répondre** au QCM d'un devoir (tentatives limitées par le teacher).
 - **Passer** un examen (QCM noté, note de passage).
@@ -274,12 +281,13 @@ com_cyonima/
 
 ## Modèle de données
 
-13 tables (préfixe `#__` = préfixe de base Joomla) :
+14 tables (préfixe `#__` = préfixe de base Joomla) :
 
 | Table                                   | Rôle                                                        |
 |-----------------------------------------|-------------------------------------------------------------|
 | `#__cyonima_courses`                    | Cours (titre, description, image, publication, teacher…)    |
-| `#__cyonima_lessons`                    | Leçons d'un cours (type, contenu, url, media, durée…)       |
+| `#__cyonima_sections`                   | Sections d'un cours (titre, ordre) qui regroupent les leçons |
+| `#__cyonima_lessons`                    | Leçons d'un cours (`section_id`, type, contenu, url, media, durée…) |
 | `#__cyonima_enrollments`                | Inscriptions d'un student à un cours (statut, progression)  |
 | `#__cyonima_lesson_progress`            | Progression par leçon (complété, score)                     |
 | `#__cyonima_assignments`                | Devoirs QCM (coefficient, tentatives, max_score)            |

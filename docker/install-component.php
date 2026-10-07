@@ -96,6 +96,7 @@ echo "Component installed.\n";
 $tables = [
     '#__cyonima_courses',
     '#__cyonima_lessons',
+    '#__cyonima_sections',
     '#__cyonima_enrollments',
     '#__cyonima_lesson_progress',
     '#__cyonima_assignments',
@@ -120,7 +121,7 @@ foreach ($tables as $table) {
     }
 }
 
-echo $missing ? "MISSING TABLES: " . implode(', ', $missing) . "\n" : "All 13 tables present.\n";
+echo $missing ? "MISSING TABLES: " . implode(', ', $missing) . "\n" : "All 14 tables present.\n";
 
 $groups = $db->setQuery(
     $db->getQuery(true)

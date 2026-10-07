@@ -77,6 +77,19 @@
 	border-radius: 4px;
 }
 
+/* Course sections (curriculum) */
+.cyonima-section__title {
+	font-size: 1.15rem;
+	font-weight: 600;
+	margin: 1.5rem 0 0;
+	padding-bottom: 0.35rem;
+	border-bottom: 2px solid #e3e3e3;
+}
+
+.cyonima-section__title + .cyonima-lessons .cyonima-lesson:first-child a {
+	padding-top: 0.5rem;
+}
+
 /* Player */
 .cyonima-video video,
 .cyonima-embed iframe {

@@ -29,9 +29,24 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_courses` (
   KEY `idx_state` (`published`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__cyonima_sections` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` int unsigned NOT NULL DEFAULT 0,
+  `title` varchar(255) NOT NULL,
+  `ordering` int NOT NULL DEFAULT 0,
+  `published` tinyint NOT NULL DEFAULT 1,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `params` text NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_course` (`course_id`),
+  KEY `idx_state` (`published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `#__cyonima_lessons` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `course_id` int unsigned NOT NULL DEFAULT 0,
+  `section_id` int unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
   `description` text NOT NULL,
@@ -51,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_lessons` (
   `params` text NULL,
   PRIMARY KEY (`id`),
   KEY `idx_course` (`course_id`),
+  KEY `idx_section` (`section_id`),
   KEY `idx_type` (`type`),
   KEY `idx_state` (`published`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;

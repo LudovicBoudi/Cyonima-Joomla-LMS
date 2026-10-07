@@ -10,4 +10,5 @@ DROP TABLE IF EXISTS `#__cyonima_assignments`;
 DROP TABLE IF EXISTS `#__cyonima_lesson_progress`;
 DROP TABLE IF EXISTS `#__cyonima_enrollments`;
 DROP TABLE IF EXISTS `#__cyonima_lessons`;
+DROP TABLE IF EXISTS `#__cyonima_sections`;
 DROP TABLE IF EXISTS `#__cyonima_courses`;

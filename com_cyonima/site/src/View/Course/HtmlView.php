@@ -22,6 +22,8 @@ class HtmlView extends BaseHtmlView
 
 	public $lessons;
 
+	public $groups;
+
 	public $enrollment;
 
 	public $completed;
@@ -35,6 +37,7 @@ class HtmlView extends BaseHtmlView
 
 		$this->course     = $model->getCourse();
 		$this->lessons    = $model->getLessons();
+		$this->groups     = $model->getLessonGroups();
 		$this->enrollment = $model->getEnrollment();
 		$this->completed  = $model->getCompletedLessons();
 		$this->isTeacher  = \Cyonima\Component\Cyonima\Administrator\Helper\CyonimaHelper::isTeacher();

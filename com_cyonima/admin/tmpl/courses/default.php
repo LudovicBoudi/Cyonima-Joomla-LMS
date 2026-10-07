@@ -53,7 +53,8 @@ HTMLHelper::_('behavior.multiselect');
 										<?php echo $this->escape($item->title); ?>
 									</a>
 									<div class="small">
-										<a href="<?php echo Route::_('index.php?option=com_cyonima&view=lessons&filter_course=' . (int) $item->id); ?>"><?php echo Text::_('COM_CYONIMA_LESSONS'); ?></a>
+										<a href="<?php echo Route::_('index.php?option=com_cyonima&view=curriculum&course_id=' . (int) $item->id); ?>"><?php echo Text::_('COM_CYONIMA_CURRICULUM'); ?></a>
+										| <a href="<?php echo Route::_('index.php?option=com_cyonima&view=lessons&filter_course=' . (int) $item->id); ?>"><?php echo Text::_('COM_CYONIMA_LESSONS'); ?></a>
 										| <a href="<?php echo Route::_('index.php?option=com_cyonima&view=monitor&course_id=' . (int) $item->id); ?>"><?php echo Text::_('COM_CYONIMA_MONITOR'); ?></a>
 									</div>
 								</td>

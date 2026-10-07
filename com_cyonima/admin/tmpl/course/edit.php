@@ -48,11 +48,15 @@ $item = $this->item;
 					<div class="control-group">
 						<label class="control-label"><?php echo Text::_('COM_CYONIMA_LESSONS'); ?></label>
 						<div class="controls">
-							<p class="form-control-plaintext">
-								<a href="<?php echo Route::_('index.php?option=com_cyonima&view=lessons&filter_course=' . (int) $item->id); ?>">
-									<?php echo Text::_('COM_CYONIMA_MANAGE_LESSONS'); ?>
-								</a>
-							</p>
+						<p class="form-control-plaintext">
+							<a href="<?php echo Route::_('index.php?option=com_cyonima&view=curriculum&course_id=' . (int) $item->id); ?>">
+								<?php echo Text::_('COM_CYONIMA_CURRICULUM'); ?>
+							</a>
+							<br>
+							<a href="<?php echo Route::_('index.php?option=com_cyonima&view=lessons&filter_course=' . (int) $item->id); ?>">
+								<?php echo Text::_('COM_CYONIMA_MANAGE_LESSONS'); ?>
+							</a>
+						</p>
 						</div>
 					</div>
 				<?php endif; ?>

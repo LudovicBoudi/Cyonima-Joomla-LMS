@@ -66,6 +66,46 @@ class com_cyonimaInstallerScript
 
 		$this->addMissingIndex('#__cyonima_questions', 'idx_assignment', 'assignment_id');
 		$this->addMissingIndex('#__cyonima_exam_attempts', 'idx_assignment', 'assignment_id');
+
+		$this->addMissingTable(
+			'#__cyonima_sections',
+			'CREATE TABLE IF NOT EXISTS `#__cyonima_sections` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` int unsigned NOT NULL DEFAULT 0,
+  `title` varchar(255) NOT NULL,
+  `ordering` int NOT NULL DEFAULT 0,
+  `published` tinyint NOT NULL DEFAULT 1,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `params` text NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_course` (`course_id`),
+  KEY `idx_state` (`published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci'
+		);
+
+		$this->addMissingColumn('#__cyonima_lessons', 'section_id', 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER `course_id`');
+		$this->addMissingIndex('#__cyonima_lessons', 'idx_section', 'section_id');
+	}
+
+	/**
+	 * Creates the table when it is missing (idempotent).
+	 *
+	 * @param   string  $table  Quoted table name (with #__ prefix).
+	 * @param   string  $sql    CREATE TABLE statement.
+	 *
+	 * @return  void
+	 */
+	private function addMissingTable(string $table, string $sql): void
+	{
+		$db   = $this->getDb();
+		$name = $db->replacePrefix($table);
+
+		if (\in_array($name, $db->getTableList(), true)) {
+			return;
+		}
+
+		$db->setQuery($sql)->execute();
 	}
 
 	/**

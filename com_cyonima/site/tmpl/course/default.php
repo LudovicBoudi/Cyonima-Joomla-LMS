@@ -69,21 +69,26 @@ $course = $this->course;
 		<?php endif; ?>
 	<?php endif; ?>
 
-	<?php if (!empty($this->lessons)) : ?>
+	<?php if (!empty($this->groups)) : ?>
 		<h2><?php echo Text::_('COM_CYONIMA_COURSE_CONTENT'); ?></h2>
-		<ul class="cyonima-lessons">
-			<?php foreach ($this->lessons as $lesson) : ?>
-				<?php
-				$isCompleted = ($this->completed[$lesson->id] ?? '') === 'completed';
-				$lessonLink  = Route::_('index.php?option=com_cyonima&view=lesson&id=' . (int) $lesson->id . ':' . $lesson->alias);
-				?>
-				<li class="cyonima-lesson <?php echo $isCompleted ? 'is-completed' : ''; ?>">
-					<a href="<?php echo $lessonLink; ?>">
-						<span class="cyonima-lesson__type"><?php echo $this->escape($lesson->type); ?></span>
-						<span class="cyonima-lesson__title"><?php echo $this->escape($lesson->title); ?></span>
-					</a>
-				</li>
-			<?php endforeach; ?>
-		</ul>
+		<?php foreach ($this->groups as $group) : ?>
+			<?php if (!empty($group['section'])) : ?>
+				<h3 class="cyonima-section__title"><?php echo $this->escape($group['section']->title); ?></h3>
+			<?php endif; ?>
+			<ul class="cyonima-lessons">
+				<?php foreach ($group['lessons'] as $lesson) : ?>
+					<?php
+					$isCompleted = ($this->completed[$lesson->id] ?? '') === 'completed';
+					$lessonLink  = Route::_('index.php?option=com_cyonima&view=lesson&id=' . (int) $lesson->id . ':' . $lesson->alias);
+					?>
+					<li class="cyonima-lesson <?php echo $isCompleted ? 'is-completed' : ''; ?>">
+						<a href="<?php echo $lessonLink; ?>">
+							<span class="cyonima-lesson__type"><?php echo $this->escape($lesson->type); ?></span>
+							<span class="cyonima-lesson__title"><?php echo $this->escape($lesson->title); ?></span>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endforeach; ?>
 	<?php endif; ?>
 </div>

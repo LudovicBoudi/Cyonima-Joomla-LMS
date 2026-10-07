@@ -85,12 +85,80 @@ class CourseModel extends BaseDatabaseModel
 				->where($db->quoteName('course_id') . ' = :id')
 				->where($db->quoteName('published') . ' = 1')
 				->bind(':id', $id, ParameterType::INTEGER)
-				->order($db->quoteName('ordering') . ' ASC')
+				->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('id') . ' ASC')
 		)->loadObjectList() ?: [];
 	}
 
 	/**
-	 * Returns the current user's enrollment for the course.
+	 * Returns the published sections of the course, in display order.
+	 *
+	 * @return  array
+	 */
+	public function getSections(): array
+	{
+		$db = $this->getDatabase();
+		$id = (int) $this->getState('course.id');
+
+		if (!$id) {
+			return [];
+		}
+
+		return $db->setQuery(
+			$db->getQuery(true)
+				->select('*')
+				->from($db->quoteName('#__cyonima_sections'))
+				->where($db->quoteName('course_id') . ' = :id')
+				->where($db->quoteName('published') . ' = 1')
+				->bind(':id', $id, ParameterType::INTEGER)
+				->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('id') . ' ASC')
+		)->loadObjectList() ?: [];
+	}
+
+	/**
+	 * Returns the lessons grouped by section: the ones without a section first,
+	 * then each published section holding its own lessons.
+	 *
+	 * @return  array  List of ['section' => object|null, 'lessons' => array].
+	 */
+	public function getLessonGroups(): array
+	{
+		$sections  = [];
+		$bySection = [];
+
+		foreach ($this->getSections() as $section) {
+			$sections[(int) $section->id]  = $section;
+			$bySection[(int) $section->id] = [];
+		}
+
+		$loose = [];
+
+		foreach ($this->getLessons() as $lesson) {
+			$sectionId = (int) $lesson->section_id;
+
+			if ($sectionId && isset($bySection[$sectionId])) {
+				$bySection[$sectionId][] = $lesson;
+			} else {
+				$loose[] = $lesson;
+			}
+		}
+
+		$groups = [];
+
+		if ($loose) {
+			$groups[] = ['section' => null, 'lessons' => $loose];
+		}
+
+		foreach ($sections as $id => $section) {
+			if ($bySection[$id]) {
+				$groups[] = ['section' => $section, 'lessons' => $bySection[$id]];
+			}
+		}
+
+		return $groups;
+	}
+
+	/**
+	 * Returns the enrollment of the current user's enrollment.
 	 *
 	 * @return  object|null
 	 */
