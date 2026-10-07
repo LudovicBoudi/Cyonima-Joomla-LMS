@@ -10,6 +10,7 @@ namespace Cyonima\Component\Cyonima\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Helper\ProgressHelper;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
@@ -23,14 +24,16 @@ class AssignmentModel extends BaseDatabaseModel
 
 		if (!$id) {
 			return (object) [
-				'id'          => 0,
-				'course_id'   => 0,
-				'lesson_id'   => 0,
-				'title'       => '',
-				'description' => '',
-				'max_score'   => 100,
-				'published'   => 1,
-				'params'      => '{}',
+				'id'               => 0,
+				'course_id'        => 0,
+				'lesson_id'        => 0,
+				'title'            => '',
+				'description'      => '',
+				'max_score'        => 100,
+				'coefficient'      => 1,
+				'attempts_allowed' => 1,
+				'published'        => 1,
+				'params'           => '{}',
 			];
 		}
 
@@ -46,6 +49,14 @@ class AssignmentModel extends BaseDatabaseModel
 
 	public function save(array $data)
 	{
+		if (isset($data['coefficient'])) {
+			$data['coefficient'] = max(0, (float) $data['coefficient']);
+		}
+
+		if (isset($data['attempts_allowed'])) {
+			$data['attempts_allowed'] = max(0, (int) $data['attempts_allowed']);
+		}
+
 		$table = $this->getMVCFactory()->createTable('Assignment');
 
 		if (!empty($data['id'])) {
@@ -59,6 +70,12 @@ class AssignmentModel extends BaseDatabaseModel
 		}
 
 		$this->setState('assignment.id', (int) $table->id);
+
+		$courseId = (int) $table->course_id ?: (int) ($data['course_id'] ?? 0);
+
+		if ($courseId) {
+			ProgressHelper::recalculateCourse($courseId);
+		}
 
 		return (int) $table->id;
 	}

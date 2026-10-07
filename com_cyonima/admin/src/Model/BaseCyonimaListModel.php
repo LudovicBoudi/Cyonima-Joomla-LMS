@@ -123,7 +123,7 @@ abstract class BaseCyonimaListModel extends ListModel
 			$where = [];
 
 			if (property_exists($table, 'course_id') && !empty($table->course_id)) {
-				$where = [$table->getDatabase()->quoteName('course_id') . ' = ' . (int) $table->course_id];
+				$where = [$this->getDatabase()->quoteName('course_id') . ' = ' . (int) $table->course_id];
 			}
 
 			if (!$table->move($delta, $where)) {

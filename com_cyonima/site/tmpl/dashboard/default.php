@@ -27,6 +27,7 @@ HTMLHelper::_('stylesheet', 'com_cyonima/cyonima.css', ['version' => 'auto', 're
 					<th><?php echo Text::_('COM_CYONIMA_COURSE'); ?></th>
 					<th><?php echo Text::_('COM_CYONIMA_STATUS'); ?></th>
 					<th><?php echo Text::_('COM_CYONIMA_PROGRESS'); ?></th>
+					<th><?php echo Text::_('COM_CYONIMA_GLOBAL_GRADE'); ?></th>
 					<th></th>
 				</tr>
 			</thead>
@@ -44,6 +45,9 @@ HTMLHelper::_('stylesheet', 'com_cyonima/cyonima.css', ['version' => 'auto', 're
 								<div class="progress-bar" style="width:<?php echo (int) $item->progress; ?>%"></div>
 							</div>
 							<?php echo (int) $item->progress; ?>%
+						</td>
+						<td>
+							<?php echo $item->max_score > 0 ? round($item->score, 1) . '%' : '&mdash;'; ?>
 						</td>
 						<td>
 							<?php if ($item->status === 'completed') : ?>

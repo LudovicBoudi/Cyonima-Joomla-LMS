@@ -34,6 +34,7 @@ $results  = $this->results;
 						<th><?php echo Text::_('COM_CYONIMA_STUDENT'); ?></th>
 						<th><?php echo Text::_('COM_CYONIMA_EMAIL'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_PROGRESS'); ?></th>
+						<th width="10%"><?php echo Text::_('COM_CYONIMA_GLOBAL_GRADE'); ?></th>
 						<th width="10%"><?php echo Text::_('JSTATUS'); ?></th>
 						<th width="15%"><?php echo Text::_('COM_CYONIMA_ENROLLED'); ?></th>
 						<th width="15%"><?php echo Text::_('COM_CYONIMA_COMPLETED'); ?></th>
@@ -45,6 +46,9 @@ $results  = $this->results;
 							<td><?php echo $this->escape($student->student); ?></td>
 							<td><?php echo $this->escape($student->email); ?></td>
 							<td><?php echo (int) $student->progress; ?>%</td>
+							<td>
+								<?php echo $student->max_score > 0 ? round($student->score, 1) . '%' : '&mdash;'; ?>
+							</td>
 							<td><?php echo $this->escape($student->status); ?></td>
 							<td><?php echo $this->escape($student->enrolled_date); ?></td>
 							<td><?php echo $this->escape($student->completed_date); ?></td>
@@ -60,18 +64,20 @@ $results  = $this->results;
 				<thead>
 					<tr>
 						<th><?php echo Text::_('JGLOBAL_TITLE'); ?></th>
+						<th><?php echo Text::_('COM_CYONIMA_STUDENT'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_SCORE'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_MAX_SCORE'); ?></th>
-						<th width="10%"><?php echo Text::_('JSTATUS'); ?></th>
+						<th width="10%"><?php echo Text::_('COM_CYONIMA_COEFFICIENT'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php foreach ($results['assignments'] as $assignment) : ?>
 						<tr>
 							<td><?php echo $this->escape($assignment->title); ?></td>
+							<td><?php echo $this->escape($assignment->student); ?></td>
 							<td><?php echo $this->escape($assignment->score); ?></td>
 							<td><?php echo $this->escape($assignment->max_score); ?></td>
-							<td><?php echo $this->escape($assignment->status); ?></td>
+							<td><?php echo $this->escape($assignment->coefficient); ?></td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -82,8 +88,10 @@ $results  = $this->results;
 				<thead>
 					<tr>
 						<th><?php echo Text::_('JGLOBAL_TITLE'); ?></th>
+						<th><?php echo Text::_('COM_CYONIMA_STUDENT'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_SCORE'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_MAX_SCORE'); ?></th>
+						<th width="10%"><?php echo Text::_('COM_CYONIMA_COEFFICIENT'); ?></th>
 						<th width="10%"><?php echo Text::_('COM_CYONIMA_PASSED'); ?></th>
 					</tr>
 				</thead>
@@ -91,8 +99,10 @@ $results  = $this->results;
 					<?php foreach ($results['exams'] as $exam) : ?>
 						<tr>
 							<td><?php echo $this->escape($exam->title); ?></td>
+							<td><?php echo $this->escape($exam->student); ?></td>
 							<td><?php echo $this->escape($exam->score); ?></td>
 							<td><?php echo $this->escape($exam->max_score); ?></td>
+							<td><?php echo $this->escape($exam->coefficient); ?></td>
 							<td><?php echo $exam->passed ? Text::_('JYES') : Text::_('JNO'); ?></td>
 						</tr>
 					<?php endforeach; ?>

@@ -11,10 +11,12 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 - [Fonctionnalités](#fonctionnalités)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
+- [Environnement de test (Docker)](#environnement-de-test-docker)
 - [Rôles et permissions](#rôles-et-permissions)
 - [Configuration](#configuration)
 - [Utilisation côté teacher](#utilisation-côté-teacher)
 - [Utilisation côté student](#utilisation-côté-student)
+- [Notation](#notation)
 - [Certificats personnalisés](#certificats-personnalisés)
 - [Architecture](#architecture)
 - [Modèle de données](#modèle-de-données)
@@ -26,9 +28,10 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 
 - **Cours** avec description riche, image, publication, accès et langue.
 - **Leçons** de 6 types : contenu riche (`content`), vidéo (`video`), PDF (`pdf`), lien externe (`link`), devoir (`assignment`) et examen (`exam`).
-- **Devoirs et exercices notés** : dépôt de texte + fichier, notation (score + feedback) par le teacher.
-- **Examens formels** : QCM (choix unique, multiple, vrai/faux), barème, note de passage, temps limite, nombre de tentatives, mélange des questions.
-- **Suivi / monitoring** : nombre d'élèves inscrits, progression (%), résultats aux devoirs et examens, par cours.
+- **Devoirs QCM notés automatiquement** : questions à choix unique, multiples ou vrai/faux, points par question, coefficient, nombre de tentatives autorisées.
+- **Examens formels** : mêmes types de questions, barème, note de passage, temps limite, coefficient, nombre de tentatives, mélange des questions.
+- **Note globale de formation** : moyenne pondérée des devoirs et examens selon leur coefficient, affichée au student (cours + tableau de bord) et au teacher (monitor).
+- **Suivi / monitoring** : nombre d'élèves inscrits, progression (%), note globale, résultats détaillés par devoir / examen (élève, score, coefficient), par cours.
 - **Inscription** en self-enrollment.
 - **Certificats de suivi** générés automatiquement à la validation d'une formation, téléchargeables en PNG.
 - **Templates de certificat** personnalisables par teacher (image JPEG/PNG + positions des textes).
@@ -109,7 +112,7 @@ Deux groupes utilisateurs sont créés et délégués à l'administration des co
 | Groupe   | Parent      | Rôle                                                |
 |----------|-------------|-----------------------------------------------------|
 | `Teacher`| `Registered`| Publie et gère les cours, devoirs, examens, certificats. |
-| `Student`| `Registered`| Suit les cours, dépose des devoirs, passe des examens. |
+| `Student`| `Registered`| Suit les cours, répond aux QCM de devoirs, passe des examens. |
 
 ### ACL par défaut appliquée à l'installation
 
@@ -140,9 +143,9 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
 | Option                          | Défaut                          | Description                                            |
 |---------------------------------|---------------------------------|--------------------------------------------------------|
 | Certificate folder              | `images/com_cyonima/certificates` | Dossier relatif de stockage des certificats générés.  |
-| Media folder                    | `images/com_cyonima`            | Dossier racine des médias (templates, fichiers de devoirs). |
+| Media folder                    | `images/com_cyonima`            | Dossier racine des médias (images de templates de certificat…). |
 | Certificate number prefix       | `CYN`                           | Préfixe des numéros de certificat.                     |
-| Notify teacher on submission    | Non                             | Notifie le teacher à chaque dépôt de devoir.           |
+| Notify teacher on submission    | Non                             | Option réservée (notifications non implémentées).      |
 
 ---
 
@@ -156,9 +159,9 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
    - `link` : lien externe ;
    - `assignment` : à relier à un devoir (menu Assignments) ;
    - `exam` : à relier à un examen (menu Exams).
-3. **Devoirs** : Composants → Assignments (description, date limite, barème). La notation se fait dans le menu **Submissions** (score + feedback).
-4. **Examens** : Composants → Exams (note de passage, temps, tentatives), puis ajouter des **Questions** (single / multiple / truefalse).
-5. **Monitoring** : depuis la liste des cours, lien « Monitor » → élèves inscrits, progression, résultats.
+3. **Devoirs** : Composants → Assignments (description, date limite, barème, **coefficient**, **tentatives autorisées**). Ajouter ensuite les **Questions** (lien « Questions » ou « Manage questions » depuis la fiche) : single / multiple / truefalse, points par question, bonne réponse cochée.
+4. **Examens** : Composants → Exams (note de passage, temps, tentatives, **coefficient**, mélange), puis ajouter des **Questions**.
+5. **Monitoring** : depuis la liste des cours, lien « Monitor » → élèves inscrits, progression, **note globale**, résultats détaillés avec le coefficient de chaque devoir/examen.
 6. **Learning paths** : Composants → Learning Paths (regrouper des cours dans un ordre).
 7. **Certificat** : Composants → Certificate Templates, uploader une image JPEG/PNG et définir les positions des textes (voir section dédiée).
 
@@ -168,12 +171,44 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
 
 - **S'inscrire** à un cours depuis le catalogue (bouton « Enroll »).
 - **Suivre** les leçons et marquer la complétion (« Mark as complete »).
-- **Déposer** un devoir (texte et/ou fichier).
-- **Passer** un examen (QCM noté).
-- **Consulter** sa progression dans « My courses ».
+- **Répondre** au QCM d'un devoir (tentatives limitées par le teacher).
+- **Passer** un examen (QCM noté, note de passage).
+- **Consulter** sa progression et sa **note globale** dans « My courses » et le tableau de bord.
 - **Télécharger** son certificat une fois la formation validée (100 % des leçons complétées), depuis « My certificates ».
 
 La validation d'une formation déclenche automatiquement l'émission du certificat.
+
+---
+
+## Notation
+
+Chaque **devoir** et chaque **examen** publié porte :
+
+- un **coefficient** (`coefficient`, par défaut `1`) ;
+- un **nombre de tentatives autorisées** (`attempts_allowed`, `0` = illimité) ;
+- les **points** de ses questions publiées.
+
+Règles de calcul :
+
+- le score d'une tentative est la somme des points des bonnes réponses, exprimée en % du total de points de l'activité ;
+- seule la **meilleure tentative** est retenue ;
+- toutes les activités publiées du cours sont comptées : une activité **non tentée vaut 0 %** ;
+- une activité est **exclue** du calcul si son coefficient est `≤ 0` ou si son total de points vaut `0` (sinon la note globale reste `null` et l'affichage affiche « — »).
+
+La **note globale** de la formation (0–100) est la moyenne pondérée :
+
+```
+note_globale = Σ (score_activité_en_pourcentage × coefficient) / Σ (coefficient)
+```
+
+Exemple : devoir réussi à 100 % (coefficient 2) et examen non tenté (coefficient 3) →
+`(100 × 2 + 0 × 3) / (2 + 3) = 40` ; les deux réussis → `100`.
+
+- affichage arrondi à une décimale (`round(x, 1)`) côté cours, tableau de bord et monitor ;
+- stockage dans `#__cyonima_enrollments.score` (la colonne `max_score` vaut `100` si une note existe, sinon `0`) ;
+- recalcul automatique à chaque tentative finalisée et à chaque leçon complétée (`ProgressHelper::recalculate()`).
+
+Les documents **Submissions** (anciens dépôts texte/fichier + notation manuelle) sont conservés pour compatibilité mais ne sont plus alimentés côté site.
 
 ---
 
@@ -247,11 +282,11 @@ com_cyonima/
 | `#__cyonima_lessons`                    | Leçons d'un cours (type, contenu, url, media, durée…)       |
 | `#__cyonima_enrollments`                | Inscriptions d'un student à un cours (statut, progression)  |
 | `#__cyonima_lesson_progress`            | Progression par leçon (complété, score)                     |
-| `#__cyonima_assignments`                | Devoirs / exercices notés                                   |
-| `#__cyonima_submissions`                | Copies rendues (contenu, fichier, score, feedback)          |
-| `#__cyonima_exams`                      | Examens (note de passage, temps, tentatives, mélange)       |
-| `#__cyonima_questions`                  | Questions d'examen (type, options JSON, réponse, points)    |
-| `#__cyonima_exam_attempts`              | Tentatives d'examen (score, réponses, réussi)               |
+| `#__cyonima_assignments`                | Devoirs QCM (coefficient, tentatives, max_score)            |
+| `#__cyonima_submissions`                | Anciennes copies (legacy : plus alimenté côté site)         |
+| `#__cyonima_exams`                      | Examens (note de passage, temps, tentatives, coefficient, mélange) |
+| `#__cyonima_questions`                  | Questions rattachées à un examen **ou** à un devoir (type, options JSON, réponse, points) |
+| `#__cyonima_exam_attempts`              | Tentatives de devoir et d'examen (score, réponses, réussi)  |
 | `#__cyonima_certificate_templates`      | Modèles de certificat (image + positions JSON)              |
 | `#__cyonima_certificates`               | Certificats émis (numéro, date, chemin fichier)             |
 | `#__cyonima_learning_paths`             | Parcours de formation (learning paths)                      |
@@ -280,7 +315,7 @@ php -r 'foreach (["com_cyonima/cyonima.xml","com_cyonima/admin/access.xml","com_
 
 ### Points d'extension possibles
 
-- Notifications email (déjà prévu via l'option `notify_teacher_on_submission`).
+- Notifications email : l'option `notify_teacher_on_submission` est en place mais le envoi reste à implémenter.
 - Intégration `com_categories` pour catégoriser les cours.
 - Versioning / historique (l'interface `VersionableTableInterface` est déjà déclarée sur `CourseTable`).
 - Traductions supplémentaires (seul `en-GB` est fourni).

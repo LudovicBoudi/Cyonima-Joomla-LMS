@@ -39,6 +39,7 @@ HTMLHelper::_('behavior.multiselect');
 							<th width="1%"><?php echo HTMLHelper::_('grid.checkall'); ?></th>
 							<th><?php echo Text::_('JGLOBAL_TITLE'); ?></th>
 							<th width="15%"><?php echo Text::_('COM_CYONIMA_COURSE'); ?></th>
+							<th width="10%"><?php echo Text::_('COM_CYONIMA_COEFFICIENT'); ?></th>
 							<th width="10%"><?php echo Text::_('COM_CYONIMA_PASS_MARK'); ?></th>
 							<th width="10%"><?php echo Text::_('COM_CYONIMA_TIME_LIMIT'); ?></th>
 							<th width="5%"><?php echo Text::_('JSTATUS'); ?></th>
@@ -58,6 +59,7 @@ HTMLHelper::_('behavior.multiselect');
 									</div>
 								</td>
 								<td><?php echo $this->escape($item->course_title); ?></td>
+								<td><?php echo $this->escape($item->coefficient); ?></td>
 								<td><?php echo (int) $item->pass_mark; ?></td>
 								<td><?php echo (int) $item->time_limit; ?></td>
 								<td><?php echo $item->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?></td>

@@ -51,7 +51,7 @@ class CourseModel extends BaseDatabaseModel
 			$db->getQuery(true)
 				->select(
 					[
-						$db->quoteName('c.*'),
+						$db->quoteName('c') . '.*',
 						$db->quoteName('u.name', 'teacher'),
 					]
 				)

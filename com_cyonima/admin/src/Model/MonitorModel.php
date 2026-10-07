@@ -51,6 +51,8 @@ class MonitorModel extends BaseDatabaseModel
 						$db->quoteName('u.name', 'student'),
 						$db->quoteName('u.email'),
 						$db->quoteName('e.progress'),
+						$db->quoteName('e.score'),
+						$db->quoteName('e.max_score'),
 						$db->quoteName('e.status'),
 						$db->quoteName('e.enrolled_date'),
 						$db->quoteName('e.completed_date'),
@@ -80,17 +82,21 @@ class MonitorModel extends BaseDatabaseModel
 			$db->getQuery(true)
 				->select(
 					[
-						$db->quoteName('s.user_id'),
+						$db->quoteName('t.user_id'),
+						$db->quoteName('u.name', 'student'),
 						$db->quoteName('a.title'),
-						$db->quoteName('s.score'),
-						$db->quoteName('a.max_score'),
-						$db->quoteName('s.status'),
+						$db->quoteName('a.coefficient'),
+						$db->quoteName('t.score'),
+						$db->quoteName('t.max_score'),
 					]
 				)
-				->from($db->quoteName('#__cyonima_submissions', 's'))
-				->innerJoin($db->quoteName('#__cyonima_assignments', 'a') . ' ON ' . $db->quoteName('a.id') . ' = ' . $db->quoteName('s.assignment_id'))
+				->from($db->quoteName('#__cyonima_exam_attempts', 't'))
+				->innerJoin($db->quoteName('#__cyonima_assignments', 'a') . ' ON ' . $db->quoteName('a.id') . ' = ' . $db->quoteName('t.assignment_id'))
+				->innerJoin($db->quoteName('#__users', 'u') . ' ON ' . $db->quoteName('u.id') . ' = ' . $db->quoteName('t.user_id'))
 				->where($db->quoteName('a.course_id') . ' = :course')
+				->where($db->quoteName('t.status') . ' = ' . $db->quote('finished'))
 				->bind(':course', $courseId, ParameterType::INTEGER)
+				->order($db->quoteName('t.id') . ' DESC')
 		)->loadObjectList() ?: [];
 
 		$exams = $db->setQuery(
@@ -98,7 +104,9 @@ class MonitorModel extends BaseDatabaseModel
 				->select(
 					[
 						$db->quoteName('t.user_id'),
+						$db->quoteName('u.name', 'student'),
 						$db->quoteName('e.title'),
+						$db->quoteName('e.coefficient'),
 						$db->quoteName('t.score'),
 						$db->quoteName('t.max_score'),
 						$db->quoteName('t.passed'),
@@ -106,9 +114,11 @@ class MonitorModel extends BaseDatabaseModel
 				)
 				->from($db->quoteName('#__cyonima_exam_attempts', 't'))
 				->innerJoin($db->quoteName('#__cyonima_exams', 'e') . ' ON ' . $db->quoteName('e.id') . ' = ' . $db->quoteName('t.exam_id'))
+				->innerJoin($db->quoteName('#__users', 'u') . ' ON ' . $db->quoteName('u.id') . ' = ' . $db->quoteName('t.user_id'))
 				->where($db->quoteName('e.course_id') . ' = :course')
 				->where($db->quoteName('t.status') . ' = ' . $db->quote('finished'))
 				->bind(':course', $courseId, ParameterType::INTEGER)
+				->order($db->quoteName('t.id') . ' DESC')
 		)->loadObjectList() ?: [];
 
 		return ['assignments' => $assignments, 'exams' => $exams];

@@ -10,27 +10,20 @@ namespace Cyonima\Component\Cyonima\Site\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\ParameterType;
 
 /**
- * Model for an assignment and the current user's submission.
+ * Model for taking and grading a QCM assignment.
  */
-class AssignmentModel extends BaseDatabaseModel
+class AssignmentModel extends QuizModel
 {
-	/**
-	 * @var  object|null
-	 */
-	private $assignment;
-
 	/**
 	 * @return  object|null
 	 */
-	public function getAssignment()
+	public function getQuiz()
 	{
-		if ($this->assignment !== null) {
-			return $this->assignment;
+		if ($this->quiz !== null) {
+			return $this->quiz;
 		}
 
 		$db = $this->getDatabase();
@@ -40,11 +33,11 @@ class AssignmentModel extends BaseDatabaseModel
 			return null;
 		}
 
-		$this->assignment = $db->setQuery(
+		$this->quiz = $db->setQuery(
 			$db->getQuery(true)
 				->select(
 					[
-						$db->quoteName('a.*'),
+						$db->quoteName('a') . '.*',
 						$db->quoteName('c.title', 'course_title'),
 						$db->quoteName('c.alias', 'course_alias'),
 					]
@@ -55,74 +48,22 @@ class AssignmentModel extends BaseDatabaseModel
 				->bind(':id', $id, ParameterType::INTEGER)
 		)->loadObject();
 
-		return $this->assignment;
+		return $this->quiz;
 	}
 
 	/**
 	 * @return  object|null
 	 */
-	public function getSubmission()
+	public function getAssignment()
 	{
-		$user = Factory::getApplication()->getIdentity();
-
-		if ($user->guest) {
-			return null;
-		}
-
-		$db = $this->getDatabase();
-		$id = (int) $this->getState('assignment.id');
-
-		return $db->setQuery(
-			$db->getQuery(true)
-				->select('*')
-				->from($db->quoteName('#__cyonima_submissions'))
-				->where($db->quoteName('assignment_id') . ' = :assignment')
-				->where($db->quoteName('user_id') . ' = :user')
-				->bind(':assignment', $id, ParameterType::INTEGER)
-				->bind(':user', $user->id, ParameterType::INTEGER)
-		)->loadObject();
+		return $this->getQuiz();
 	}
 
 	/**
-	 * Save a submission for the current user.
-	 *
-	 * @param   string  $content    Text answer.
-	 * @param   string  $fileName   Uploaded file name.
-	 *
-	 * @return  boolean
+	 * @return  string
 	 */
-	public function submit(string $content, string $fileName = ''): bool
+	protected function getParentColumn(): string
 	{
-		$user = Factory::getApplication()->getIdentity();
-		$db   = $this->getDatabase();
-
-		$assignment = $this->getAssignment();
-
-		if (!$assignment || $user->guest) {
-			return false;
-		}
-
-		$existing = $this->getSubmission();
-
-		$data = [
-			'id'             => $existing->id ?? 0,
-			'assignment_id'  => (int) $assignment->id,
-			'user_id'        => (int) $user->id,
-			'content'        => $content,
-			'file_name'      => $fileName,
-			'submitted_date' => Factory::getDate()->toSql(),
-			'status'         => 'submitted',
-		];
-
-		/** @var \Cyonima\Component\Cyonima\Administrator\Table\SubmissionTable $table */
-		$table = $this->getMVCFactory()->createTable('Submission');
-
-		if (!$table->save($data)) {
-			$this->setError($table->getError());
-
-			return false;
-		}
-
-		return true;
+		return 'assignment_id';
 	}
 }

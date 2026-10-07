@@ -12,6 +12,7 @@ namespace Cyonima\Component\Cyonima\Administrator\Controller;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\AdminController;
+use Joomla\Database\DatabaseInterface;
 
 /**
  * Issued certificates list controller.
@@ -28,7 +29,7 @@ class CertificatesController extends AdminController
 		$app = Factory::getApplication();
 		$id  = $app->input->getInt('id');
 
-		$db = $this->getDatabase();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$cert = $db->setQuery(
 			$db->getQuery(true)
@@ -43,9 +44,10 @@ class CertificatesController extends AdminController
 
 		$path = JPATH_ROOT . '/' . trim($cert->file_path, '/');
 
-		$app->setHeader('Content-Type', 'image/png', true);
-		$app->setHeader('Content-Disposition', 'attachment; filename="' . basename($path) . '"', true);
-		$app->setHeader('Content-Length', (string) filesize($path), true);
+		$app->setHeader('Content-Type', 'image/png', true)
+			->setHeader('Content-Disposition', 'attachment; filename="' . basename($path) . '"', true)
+			->setHeader('Content-Length', (string) filesize($path), true)
+			->sendHeaders();
 
 		readfile($path);
 		$app->close();

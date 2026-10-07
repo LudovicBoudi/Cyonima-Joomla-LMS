@@ -22,6 +22,9 @@ class QuestionsModel extends BaseCyonimaListModel
 		$exam = $this->getUserStateFromRequest($this->context . '.filter.exam', 'filter_exam', '');
 		$this->setState('filter.exam', $exam);
 
+		$assignment = $this->getUserStateFromRequest($this->context . '.filter.assignment', 'filter_assignment', '');
+		$this->setState('filter.assignment', $assignment);
+
 		parent::populateState($ordering, $direction);
 	}
 
@@ -43,15 +46,29 @@ class QuestionsModel extends BaseCyonimaListModel
 				$db->quoteName('q.points'),
 				$db->quoteName('q.ordering'),
 				$db->quoteName('q.published'),
+				$db->quoteName('q.exam_id'),
+				$db->quoteName('q.assignment_id'),
 			]
 		)
-			->from($db->quoteName('#__cyonima_questions', 'q'));
+			->select(
+				'COALESCE(' . $db->quoteName('e.title') . ', ' . $db->quoteName('a.title') . ', ' . $db->quote('') . ') AS ' . $db->quoteName('parent_title')
+			)
+			->from($db->quoteName('#__cyonima_questions', 'q'))
+			->leftJoin($db->quoteName('#__cyonima_exams', 'e') . ' ON ' . $db->quoteName('e.id') . ' = ' . $db->quoteName('q.exam_id'))
+			->leftJoin($db->quoteName('#__cyonima_assignments', 'a') . ' ON ' . $db->quoteName('a.id') . ' = ' . $db->quoteName('q.assignment_id'));
 
 		$exam = $this->getState('filter.exam');
 
 		if (is_numeric($exam)) {
 			$query->where($db->quoteName('q.exam_id') . ' = :exam')
 				->bind(':exam', $exam, ParameterType::INTEGER);
+		}
+
+		$assignment = $this->getState('filter.assignment');
+
+		if (is_numeric($assignment)) {
+			$query->where($db->quoteName('q.assignment_id') . ' = :assignment')
+				->bind(':assignment', $assignment, ParameterType::INTEGER);
 		}
 
 		$query->order($db->quoteName('q.ordering') . ' ASC');

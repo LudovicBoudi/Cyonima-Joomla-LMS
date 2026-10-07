@@ -12,6 +12,7 @@ namespace Cyonima\Component\Cyonima\Administrator\Helper;
 
 use Cyonima\Component\Cyonima\Administrator\Table\CertificateTable;
 use Joomla\CMS\Factory;
+use Joomla\CMS\User\User;
 use Joomla\Registry\Registry;
 
 /**
@@ -50,7 +51,7 @@ class CertificateHelper
 				->where($db->quoteName('id') . ' = ' . $courseId)
 		)->loadObject();
 
-		$student = Factory::getContainer()->get('UserFactory')->loadUserById($userId);
+		$student = new User($userId);
 
 		if (!$course || !$student || !$student->id) {
 			return null;

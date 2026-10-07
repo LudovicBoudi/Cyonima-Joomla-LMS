@@ -16,12 +16,38 @@ use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 
 /**
- * Assignment controller (submission).
+ * Assignment controller (QCM attempts).
  */
 class AssignmentController extends BaseController
 {
 	/**
-	 * Submit an assignment.
+	 * Start a new assignment attempt.
+	 *
+	 * @return  void
+	 */
+	public function start()
+	{
+		$this->checkToken();
+
+		$app = Factory::getApplication();
+		$id  = (int) $app->input->getInt('id');
+
+		$model = $this->getModel('Assignment', 'Site');
+		$model->setState('assignment.id', $id);
+
+		$attemptId = $model->startAttempt();
+
+		if ($attemptId) {
+			$app->setUserState('com_cyonima.assignment.attempt', $attemptId);
+			$app->redirect(Route::_('index.php?option=com_cyonima&view=assignment&id=' . $id . '&attempt=' . $attemptId));
+		}
+
+		$app->enqueueMessage($model->getError() ?: Text::_('COM_CYONIMA_EXAM_START_ERROR'), 'error');
+		$this->setRedirect(Route::_('index.php?option=com_cyonima&view=assignment&id=' . $id));
+	}
+
+	/**
+	 * Submit assignment answers and grade the attempt.
 	 *
 	 * @return  void
 	 */
@@ -29,63 +55,22 @@ class AssignmentController extends BaseController
 	{
 		$this->checkToken();
 
-		$app   = Factory::getApplication();
-		$input = $app->input;
-		$id    = (int) $input->getInt('id');
+		$app       = Factory::getApplication();
+		$input     = $app->input;
+		$id        = (int) $input->getInt('id');
+		$attemptId = (int) $input->getInt('attempt');
 
 		$model = $this->getModel('Assignment', 'Site');
 		$model->setState('assignment.id', $id);
 
-		$redirect = Route::_('index.php?option=com_cyonima&view=assignment&id=' . $id);
+		$answers = $input->get('answers', [], 'array');
 
-		if (!$model->getAssignment()) {
-			$app->enqueueMessage(Text::_('COM_CYONIMA_ERROR_ASSIGNMENT_NOT_FOUND'), 'error');
-			$this->setRedirect(Route::_('index.php?option=com_cyonima&view=courses'));
-
-			return;
-		}
-
-		$content  = $input->get('content', '', 'raw');
-		$fileName = '';
-
-		$file = $input->files->get('file');
-
-		if (!empty($file['name'])) {
-			$fileName = $this->uploadFile($file);
-		}
-
-		if ($model->submit($content, $fileName)) {
-			$app->enqueueMessage(Text::_('COM_CYONIMA_SUBMISSION_SUCCESS'), 'message');
+		if ($model->submitAttempt($attemptId, $answers)) {
+			$app->enqueueMessage(Text::_('COM_CYONIMA_EXAM_SUBMITTED'), 'message');
 		} else {
-			$app->enqueueMessage($model->getError() ?: Text::_('COM_CYONIMA_SUBMISSION_ERROR'), 'error');
+			$app->enqueueMessage($model->getError() ?: Text::_('COM_CYONIMA_EXAM_SUBMIT_ERROR'), 'error');
 		}
 
-		$this->setRedirect($redirect);
-	}
-
-	/**
-	 * Upload a submission file and return its stored relative path.
-	 *
-	 * @param   array  $file  Uploaded file array.
-	 *
-	 * @return  string
-	 */
-	private function uploadFile(array $file): string
-	{
-		$app     = Factory::getApplication();
-		$params  = $app->bootComponent('com_cyonima')->getParams();
-		$base    = trim($params->get('media_path', 'images/com_cyonima'), '/');
-		$sub     = 'submissions';
-		$dir     = JPATH_ROOT . '/' . $base . '/' . $sub;
-		$name    = \Joomla\Filesystem\File::makeSafe($file['name']);
-		$target  = $dir . '/' . time() . '_' . $name;
-
-		\Joomla\Filesystem\Folder::create($dir);
-
-		if (!\Joomla\CMS\Filesystem\File::upload($file['tmp_name'], $target)) {
-			return '';
-		}
-
-		return $base . '/' . $sub . '/' . basename($target);
+		$this->setRedirect(Route::_('index.php?option=com_cyonima&view=assignment&id=' . $id));
 	}
 }

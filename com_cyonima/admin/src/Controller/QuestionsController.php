@@ -21,6 +21,12 @@ class QuestionsController extends BaseCyonimaListController
 	{
 		$exam = $this->input->getInt('filter_exam');
 
-		return $exam ? '&exam_id=' . $exam : '';
+		if ($exam) {
+			return '&exam_id=' . $exam;
+		}
+
+		$assignment = $this->input->getInt('filter_assignment');
+
+		return $assignment ? '&assignment_id=' . $assignment : '';
 	}
 }

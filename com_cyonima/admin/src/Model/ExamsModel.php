@@ -37,6 +37,7 @@ class ExamsModel extends BaseCyonimaListModel
 				$db->quoteName('e.title'),
 				$db->quoteName('e.pass_mark'),
 				$db->quoteName('e.time_limit'),
+				$db->quoteName('e.coefficient'),
 				$db->quoteName('e.published'),
 				$db->quoteName('c.title', 'course_title'),
 			]

@@ -37,9 +37,11 @@ HTMLHelper::_('stylesheet', 'com_cyonima/cyonima.css', ['version' => 'auto', 're
 						<td><?php echo $this->escape($item->certificate_number); ?></td>
 						<td><?php echo $this->escape($item->issued_date); ?></td>
 						<td>
-							<a class="btn btn-sm btn-primary" href="<?php echo Route::_('index.php?option=com_cyonima&task=certificate.download&id=' . (int) $item->id); ?>">
-								<?php echo Text::_('COM_CYONIMA_DOWNLOAD'); ?>
-							</a>
+							<?php if ($item->file_exists) : ?>
+								<a class="btn btn-sm btn-primary" href="<?php echo Route::_('index.php?option=com_cyonima&task=certificate.download&id=' . (int) $item->id); ?>">
+									<?php echo Text::_('COM_CYONIMA_DOWNLOAD'); ?>
+								</a>
+							<?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>

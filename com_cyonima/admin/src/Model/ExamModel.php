@@ -10,6 +10,7 @@ namespace Cyonima\Component\Cyonima\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Helper\ProgressHelper;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 
 /**
@@ -32,6 +33,7 @@ class ExamModel extends BaseDatabaseModel
 				'pass_mark'        => 50,
 				'attempts_allowed' => 1,
 				'shuffle'          => 0,
+				'coefficient'      => 1,
 				'published'        => 1,
 				'params'           => '{}',
 			];
@@ -49,6 +51,14 @@ class ExamModel extends BaseDatabaseModel
 
 	public function save(array $data)
 	{
+		if (isset($data['coefficient'])) {
+			$data['coefficient'] = max(0, (float) $data['coefficient']);
+		}
+
+		if (isset($data['attempts_allowed'])) {
+			$data['attempts_allowed'] = max(0, (int) $data['attempts_allowed']);
+		}
+
 		$table = $this->getMVCFactory()->createTable('Exam');
 
 		if (!empty($data['id'])) {
@@ -62,6 +72,12 @@ class ExamModel extends BaseDatabaseModel
 		}
 
 		$this->setState('exam.id', (int) $table->id);
+
+		$courseId = (int) $table->course_id ?: (int) ($data['course_id'] ?? 0);
+
+		if ($courseId) {
+			ProgressHelper::recalculateCourse($courseId);
+		}
 
 		return (int) $table->id;
 	}

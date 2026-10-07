@@ -95,6 +95,8 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_assignments` (
   `description` mediumtext NOT NULL,
   `due_date` datetime NULL DEFAULT NULL,
   `max_score` int unsigned NOT NULL DEFAULT 100,
+  `coefficient` decimal(10,2) NOT NULL DEFAULT 1,
+  `attempts_allowed` int unsigned NOT NULL DEFAULT 1,
   `published` tinyint NOT NULL DEFAULT 0,
   `created` datetime NOT NULL,
   `created_by` int unsigned NOT NULL DEFAULT 0,
@@ -133,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_exams` (
   `pass_mark` int unsigned NOT NULL DEFAULT 50,
   `attempts_allowed` int unsigned NOT NULL DEFAULT 1,
   `shuffle` tinyint NOT NULL DEFAULT 0,
+  `coefficient` decimal(10,2) NOT NULL DEFAULT 1,
   `published` tinyint NOT NULL DEFAULT 0,
   `created` datetime NOT NULL,
   `created_by` int unsigned NOT NULL DEFAULT 0,
@@ -146,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_exams` (
 CREATE TABLE IF NOT EXISTS `#__cyonima_questions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `exam_id` int unsigned NOT NULL DEFAULT 0,
+  `assignment_id` int unsigned NOT NULL DEFAULT 0,
   `question` text NOT NULL,
   `type` varchar(20) NOT NULL DEFAULT 'single',
   `options` text NOT NULL,
@@ -154,12 +158,14 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_questions` (
   `ordering` int NOT NULL DEFAULT 0,
   `published` tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `idx_exam` (`exam_id`)
+  KEY `idx_exam` (`exam_id`),
+  KEY `idx_assignment` (`assignment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__cyonima_exam_attempts` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `exam_id` int unsigned NOT NULL DEFAULT 0,
+  `assignment_id` int unsigned NOT NULL DEFAULT 0,
   `user_id` int unsigned NOT NULL DEFAULT 0,
   `started` datetime NOT NULL,
   `finished` datetime NULL DEFAULT NULL,
@@ -170,6 +176,7 @@ CREATE TABLE IF NOT EXISTS `#__cyonima_exam_attempts` (
   `status` varchar(20) NOT NULL DEFAULT 'in_progress',
   PRIMARY KEY (`id`),
   KEY `idx_exam` (`exam_id`),
+  KEY `idx_assignment` (`assignment_id`),
   KEY `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 

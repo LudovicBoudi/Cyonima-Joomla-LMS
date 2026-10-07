@@ -41,6 +41,9 @@ $course = $this->course;
 	<?php if ($this->enrollment) : ?>
 		<div class="cyonima-enrollment-status">
 			<?php echo Text::sprintf('COM_CYONIMA_PROGRESS_PERCENT', (int) $this->enrollment->progress); ?>
+			<?php if ($this->enrollment->max_score > 0) : ?>
+				&middot; <?php echo Text::sprintf('COM_CYONIMA_GLOBAL_GRADE_VALUE', round($this->enrollment->score, 1)); ?>
+			<?php endif; ?>
 		</div>
 
 		<?php if ($this->enrollment->status === 'completed') : ?>

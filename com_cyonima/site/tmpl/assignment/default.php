@@ -31,33 +31,68 @@ $assignment = $this->assignment;
 
 	<h1><?php echo $this->escape($assignment->title); ?></h1>
 
-	<div><?php echo HTMLHelper::_('content.prepare', $assignment->description); ?></div>
+	<?php if ($assignment->description) : ?>
+		<div><?php echo HTMLHelper::_('content.prepare', $assignment->description); ?></div>
+	<?php endif; ?>
 
-	<?php if ($assignment->due_date !== '0000-00-00 00:00:00' && $assignment->due_date) : ?>
+	<?php if (!empty($assignment->due_date) && $assignment->due_date !== '0000-00-00 00:00:00') : ?>
 		<p class="cyonima-muted"><?php echo Text::sprintf('COM_CYONIMA_ASSIGNMENT_DUE', $this->escape($assignment->due_date)); ?></p>
 	<?php endif; ?>
 
-	<?php if ($this->submission && $this->submission->status !== 'graded') : ?>
-		<div class="alert alert-info"><?php echo Text::_('COM_CYONIMA_SUBMISSION_PENDING'); ?></div>
-	<?php elseif ($this->submission) : ?>
-		<div class="alert alert-success">
-			<?php echo Text::sprintf('COM_CYONIMA_SUBMISSION_GRADED', $this->escape($this->submission->score), $this->escape($assignment->max_score)); ?>
-			<?php if ($this->submission->feedback) : ?>
-				<p><?php echo $this->escape($this->submission->feedback); ?></p>
-			<?php endif; ?>
-		</div>
-	<?php else : ?>
-		<form action="<?php echo Route::_('index.php?option=com_cyonima&task=assignment.submit&id=' . (int) $assignment->id); ?>" method="post" enctype="multipart/form-data">
+	<?php if ($this->attemptId) : ?>
+		<form action="<?php echo Route::_('index.php?option=com_cyonima&task=assignment.submit&id=' . (int) $assignment->id); ?>" method="post">
 			<?php echo HTMLHelper::_('form.token'); ?>
-			<div class="control-group">
-				<label for="assignment-content"><?php echo Text::_('COM_CYONIMA_ASSIGNMENT_ANSWER'); ?></label>
-				<textarea class="form-control" name="content" id="assignment-content" rows="8"></textarea>
-			</div>
-			<div class="control-group">
-				<label for="assignment-file"><?php echo Text::_('COM_CYONIMA_ASSIGNMENT_FILE'); ?></label>
-				<input type="file" name="file" id="assignment-file" class="form-control">
-			</div>
-			<button type="submit" class="btn btn-primary"><?php echo Text::_('COM_CYONIMA_SUBMIT'); ?></button>
+			<input type="hidden" name="attempt" value="<?php echo (int) $this->attemptId; ?>">
+
+			<?php if (!$this->questions) : ?>
+				<p><?php echo Text::_('COM_CYONIMA_NO_QUESTIONS'); ?></p>
+			<?php endif; ?>
+
+			<?php foreach ($this->questions as $i => $question) : ?>
+				<fieldset class="cyonima-question">
+					<legend><?php echo ($i + 1) . '. ' . $this->escape($question->question); ?></legend>
+
+					<?php if ($question->type === 'multiple') : ?>
+						<?php foreach ($question->options as $oi => $option) : ?>
+							<label>
+								<input type="checkbox" name="answers[<?php echo (int) $question->id; ?>][]" value="<?php echo (int) $oi; ?>">
+								<?php echo $this->escape($option); ?>
+							</label><br>
+						<?php endforeach; ?>
+
+					<?php else : ?>
+						<?php foreach ($question->options as $oi => $option) : ?>
+							<label>
+								<input type="radio" name="answers[<?php echo (int) $question->id; ?>]" value="<?php echo (int) $oi; ?>">
+								<?php echo $this->escape($option); ?>
+							</label><br>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</fieldset>
+			<?php endforeach; ?>
+
+			<button type="submit" class="btn btn-primary"><?php echo Text::_('COM_CYONIMA_SUBMIT_EXAM'); ?></button>
 		</form>
+
+	<?php else : ?>
+		<?php if ($this->attempts) : ?>
+			<h2><?php echo Text::_('COM_CYONIMA_EXAM_RESULTS'); ?></h2>
+			<ul>
+				<?php foreach ($this->attempts as $attempt) : ?>
+					<li>
+						<?php echo Text::sprintf('COM_CYONIMA_EXAM_RESULT_ROW', $this->escape($attempt->score), $this->escape($attempt->max_score), $attempt->passed ? Text::_('JYES') : Text::_('JNO')); ?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
+
+		<?php if ($this->canAttempt) : ?>
+			<form action="<?php echo Route::_('index.php?option=com_cyonima&task=assignment.start&id=' . (int) $assignment->id); ?>" method="post">
+				<?php echo HTMLHelper::_('form.token'); ?>
+				<button type="submit" class="btn btn-primary"><?php echo Text::_('COM_CYONIMA_START_ASSIGNMENT'); ?></button>
+			</form>
+		<?php else : ?>
+			<p><?php echo Text::_('COM_CYONIMA_NO_ATTEMPTS_LEFT'); ?></p>
+		<?php endif; ?>
 	<?php endif; ?>
 </div>

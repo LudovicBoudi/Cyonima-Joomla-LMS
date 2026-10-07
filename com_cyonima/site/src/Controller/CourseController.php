@@ -10,10 +10,13 @@ namespace Cyonima\Component\Cyonima\Site\Controller;
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Table\EnrollmentTable;
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
 /**
@@ -48,7 +51,7 @@ class CourseController extends BaseController
 			return;
 		}
 
-		$db = $this->getDatabase();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$course = $db->setQuery(
 			$db->getQuery(true)
@@ -82,7 +85,7 @@ class CourseController extends BaseController
 			return;
 		}
 
-		$table = $this->getMVCFactory()->createTable('Enrollment');
+		$table = new EnrollmentTable($db);
 
 		$table->bind([
 			'course_id'     => $id,

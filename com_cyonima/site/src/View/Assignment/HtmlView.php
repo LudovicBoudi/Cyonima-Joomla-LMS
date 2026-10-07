@@ -14,21 +14,30 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
- * Assignment view.
+ * Assignment taking view.
  */
 class HtmlView extends BaseHtmlView
 {
 	public $assignment;
 
-	public $submission;
+	public $questions;
+
+	public $attempts;
+
+	public $canAttempt;
+
+	public $attemptId;
 
 	public function display($tpl = null)
 	{
 		$model = $this->getModel();
 		$model->setState('assignment.id', Factory::getApplication()->input->getInt('id'));
 
-		$this->assignment = $model->getAssignment();
-		$this->submission = $model->getSubmission();
+		$this->assignment = $model->getQuiz();
+		$this->questions  = $model->getQuestions();
+		$this->attempts   = $model->getAttempts();
+		$this->canAttempt = $model->canAttempt();
+		$this->attemptId  = Factory::getApplication()->input->getInt('attempt');
 
 		parent::display($tpl);
 	}

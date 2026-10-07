@@ -28,6 +28,8 @@ class DashboardModel extends ListModel
 			[
 				$db->quoteName('e.id'),
 				$db->quoteName('e.progress'),
+				$db->quoteName('e.score'),
+				$db->quoteName('e.max_score'),
 				$db->quoteName('e.status'),
 				$db->quoteName('e.enrolled_date'),
 				$db->quoteName('e.completed_date'),

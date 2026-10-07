@@ -27,7 +27,7 @@ class SubmissionModel extends BaseDatabaseModel
 			$db->getQuery(true)
 				->select(
 					[
-						$db->quoteName('s.*'),
+						$db->quoteName('s') . '.*',
 						$db->quoteName('u.name', 'student'),
 						$db->quoteName('a.title', 'assignment_title'),
 						$db->quoteName('a.max_score'),

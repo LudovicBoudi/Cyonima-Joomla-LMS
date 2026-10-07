@@ -11,10 +11,12 @@ namespace Cyonima\Component\Cyonima\Site\Controller;
 \defined('_JEXEC') or die;
 
 use Cyonima\Component\Cyonima\Administrator\Helper\ProgressHelper;
+use Cyonima\Component\Cyonima\Administrator\Table\LessonProgressTable;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
 /**
@@ -35,7 +37,7 @@ class LessonController extends BaseController
 		$user = $app->getIdentity();
 		$id   = (int) $app->input->getInt('id');
 
-		$db = $this->getDatabase();
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$lesson = $db->setQuery(
 			$db->getQuery(true)
@@ -80,7 +82,7 @@ class LessonController extends BaseController
 				->bind(':lesson', $id, ParameterType::INTEGER)
 		)->loadObject();
 
-		$table = $this->getMVCFactory()->createTable('LessonProgress');
+		$table = new LessonProgressTable($db);
 
 		if ($progress) {
 			$table->load($progress->id);

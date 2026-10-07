@@ -60,10 +60,19 @@ $item = $this->item;
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label" for="jform_coefficient"><?php echo Text::_('COM_CYONIMA_COEFFICIENT'); ?></label>
+			<div class="controls">
+				<input type="number" step="0.01" min="0" name="jform[coefficient]" id="jform_coefficient" class="form-control"
+					value="<?php echo $this->escape($item->coefficient ?? 1); ?>">
+				<span class="form-control-plaintext small"><?php echo Text::_('COM_CYONIMA_COEFFICIENT_HINT'); ?></span>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label" for="jform_attempts_allowed"><?php echo Text::_('COM_CYONIMA_ATTEMPTS_ALLOWED'); ?></label>
 			<div class="controls">
-				<input type="number" name="jform[attempts_allowed]" id="jform_attempts_allowed" class="form-control"
+				<input type="number" min="0" name="jform[attempts_allowed]" id="jform_attempts_allowed" class="form-control"
 					value="<?php echo $this->escape($item->attempts_allowed ?? 1); ?>">
+				<span class="form-control-plaintext small"><?php echo Text::_('COM_CYONIMA_ATTEMPTS_ALLOWED_HINT'); ?></span>
 			</div>
 		</div>
 		<div class="control-group">
@@ -75,6 +84,18 @@ $item = $this->item;
 				</select>
 			</div>
 		</div>
+		<?php if (!empty($item->id)) : ?>
+			<div class="control-group">
+				<label class="control-label"><?php echo Text::_('COM_CYONIMA_QUESTIONS'); ?></label>
+				<div class="controls">
+					<p class="form-control-plaintext">
+						<a href="<?php echo Route::_('index.php?option=com_cyonima&view=questions&filter_exam=' . (int) $item->id); ?>">
+							<?php echo Text::_('COM_CYONIMA_MANAGE_QUESTIONS'); ?>
+						</a>
+					</p>
+				</div>
+			</div>
+		<?php endif; ?>
 		<div class="control-group">
 			<label class="control-label" for="jform_published"><?php echo Text::_('JSTATUS'); ?></label>
 			<div class="controls">

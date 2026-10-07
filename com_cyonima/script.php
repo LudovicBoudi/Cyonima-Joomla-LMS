@@ -46,8 +46,70 @@ class com_cyonimaInstallerScript
 		$this->createUserGroup(self::GROUP_TEACHER);
 		$this->createUserGroup(self::GROUP_STUDENT);
 		$this->setDefaultAcl();
+		$this->migrateSchema();
 
 		return true;
+	}
+
+	/**
+	 * Adds columns and indexes introduced after the first release (idempotent).
+	 *
+	 * @return  void
+	 */
+	private function migrateSchema(): void
+	{
+		$this->addMissingColumn('#__cyonima_assignments', 'coefficient', 'DECIMAL(10,2) NOT NULL DEFAULT 1 AFTER `max_score`');
+		$this->addMissingColumn('#__cyonima_assignments', 'attempts_allowed', 'INT UNSIGNED NOT NULL DEFAULT 1 AFTER `coefficient`');
+		$this->addMissingColumn('#__cyonima_exams', 'coefficient', 'DECIMAL(10,2) NOT NULL DEFAULT 1 AFTER `shuffle`');
+		$this->addMissingColumn('#__cyonima_questions', 'assignment_id', 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER `exam_id`');
+		$this->addMissingColumn('#__cyonima_exam_attempts', 'assignment_id', 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER `exam_id`');
+
+		$this->addMissingIndex('#__cyonima_questions', 'idx_assignment', 'assignment_id');
+		$this->addMissingIndex('#__cyonima_exam_attempts', 'idx_assignment', 'assignment_id');
+	}
+
+	/**
+	 * @param   string  $table       Quoted table name (with #__ prefix).
+	 * @param   string  $column      Column name.
+	 * @param   string  $definition  Column definition.
+	 *
+	 * @return  void
+	 */
+	private function addMissingColumn(string $table, string $column, string $definition): void
+	{
+		$db   = $this->getDb();
+		$name = $db->replacePrefix($table);
+
+		$columns = $db->getTableColumns($name);
+
+		if (\array_key_exists($column, $columns)) {
+			return;
+		}
+
+		$db->setQuery('ALTER TABLE `' . $name . '` ADD COLUMN `' . $column . '` ' . $definition)->execute();
+	}
+
+	/**
+	 * @param   string  $table    Quoted table name (with #__ prefix).
+	 * @param   string  $index    Index name.
+	 * @param   string  $column   Column name.
+	 *
+	 * @return  void
+	 */
+	private function addMissingIndex(string $table, string $index, string $column): void
+	{
+		$db   = $this->getDb();
+		$name = $db->replacePrefix($table);
+
+		$exists = $db->setQuery(
+			'SHOW INDEX FROM `' . $name . '` WHERE Key_name = ' . $db->quote($index)
+		)->loadObject();
+
+		if ($exists) {
+			return;
+		}
+
+		$db->setQuery('ALTER TABLE `' . $name . '` ADD INDEX `' . $index . '` (`' . $column . '`)')->execute();
 	}
 
 	/**

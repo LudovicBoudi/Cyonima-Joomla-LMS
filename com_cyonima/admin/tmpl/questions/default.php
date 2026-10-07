@@ -22,13 +22,16 @@ HTMLHelper::_('behavior.multiselect');
 				<div class="js-stools">
 					<div class="btn-toolbar">
 						<div class="input-group">
-							<input type="text" name="filter_exam" id="filter_exam" class="form-control"
-								value="<?php echo $this->escape($this->state->get('filter.exam')); ?>"
-								placeholder="<?php echo Text::_('COM_CYONIMA_EXAM'); ?>">
-							<button class="btn btn-primary" type="submit"><?php echo Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
-							<button class="btn btn-secondary" type="button" onclick="document.getElementById('filter_exam').value='';this.form.submit();">
-								<?php echo Text::_('JSEARCH_FILTER_CLEAR'); ?>
-							</button>
+						<input type="text" name="filter_exam" id="filter_exam" class="form-control"
+							value="<?php echo $this->escape($this->state->get('filter.exam')); ?>"
+							placeholder="<?php echo Text::_('COM_CYONIMA_EXAM'); ?>">
+						<input type="text" name="filter_assignment" id="filter_assignment" class="form-control"
+							value="<?php echo $this->escape($this->state->get('filter.assignment')); ?>"
+							placeholder="<?php echo Text::_('COM_CYONIMA_ASSIGNMENT'); ?>">
+						<button class="btn btn-primary" type="submit"><?php echo Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
+						<button class="btn btn-secondary" type="button" onclick="document.getElementById('filter_exam').value='';document.getElementById('filter_assignment').value='';this.form.submit();">
+							<?php echo Text::_('JSEARCH_FILTER_CLEAR'); ?>
+						</button>
 						</div>
 					</div>
 				</div>
@@ -37,8 +40,9 @@ HTMLHelper::_('behavior.multiselect');
 					<thead>
 						<tr>
 							<th width="1%"><?php echo HTMLHelper::_('grid.checkall'); ?></th>
-							<th><?php echo Text::_('COM_CYONIMA_QUESTION'); ?></th>
-							<th width="10%"><?php echo Text::_('COM_CYONIMA_TYPE'); ?></th>
+						<th><?php echo Text::_('COM_CYONIMA_QUESTION'); ?></th>
+						<th><?php echo Text::_('COM_CYONIMA_QUESTION_PARENT'); ?></th>
+						<th width="10%"><?php echo Text::_('COM_CYONIMA_TYPE'); ?></th>
 							<th width="10%"><?php echo Text::_('COM_CYONIMA_POINTS'); ?></th>
 							<th width="5%"><?php echo Text::_('JGRID_HEADING_ORDERING'); ?></th>
 							<th width="5%"><?php echo Text::_('JSTATUS'); ?></th>
@@ -54,6 +58,7 @@ HTMLHelper::_('behavior.multiselect');
 										<?php echo $this->escape($item->question); ?>
 									</a>
 								</td>
+								<td><?php echo $this->escape($item->parent_title); ?></td>
 								<td><?php echo $this->escape($item->type); ?></td>
 								<td><?php echo (int) $item->points; ?></td>
 								<td><?php echo (int) $item->ordering; ?></td>

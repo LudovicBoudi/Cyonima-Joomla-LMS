@@ -44,7 +44,7 @@ abstract class CyonimaHelper
 	 */
 	public static function getParams(): Registry
 	{
-		return Factory::getApplication()->bootComponent('com_cyonima')->getParams();
+		return ComponentHelper::getParams('com_cyonima');
 	}
 
 	/**

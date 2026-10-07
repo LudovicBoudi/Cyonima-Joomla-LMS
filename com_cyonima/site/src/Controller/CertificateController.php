@@ -42,9 +42,10 @@ class CertificateController extends BaseController
 			throw new \Exception(Text::_('COM_CYONIMA_ERROR_CERTIFICATE_FILE_MISSING'), 404);
 		}
 
-		$app->setHeader('Content-Type', 'image/png', true);
-		$app->setHeader('Content-Disposition', 'attachment; filename="' . basename($path) . '"', true);
-		$app->setHeader('Content-Length', (string) filesize($path), true);
+		$app->setHeader('Content-Type', 'image/png', true)
+			->setHeader('Content-Disposition', 'attachment; filename="' . basename($path) . '"', true)
+			->setHeader('Content-Length', (string) filesize($path), true)
+			->sendHeaders();
 
 		readfile($path);
 		$app->close();

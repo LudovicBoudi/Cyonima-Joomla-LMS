@@ -10,6 +10,8 @@ namespace Cyonima\Component\Cyonima\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Table\EnrollmentTable;
+
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\Router\Route;
@@ -28,9 +30,9 @@ class EnrollmentsController extends AdminController
 	{
 		$this->checkToken();
 
-		$cid = array_filter((array) $this->input->get('cid', [], 'int'));
-
-		$table = $this->getMVCFactory()->createTable('Enrollment');
+		$cid   = array_filter((array) $this->input->get('cid', [], 'int'));
+		$db    = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+		$table = new EnrollmentTable($db);
 
 		foreach ($cid as $id) {
 			$table->delete((int) $id);

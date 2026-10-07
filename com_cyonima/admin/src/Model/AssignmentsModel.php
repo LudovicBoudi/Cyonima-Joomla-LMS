@@ -40,6 +40,7 @@ class AssignmentsModel extends BaseCyonimaListModel
 				$db->quoteName('a.id'),
 				$db->quoteName('a.title'),
 				$db->quoteName('a.max_score'),
+				$db->quoteName('a.coefficient'),
 				$db->quoteName('a.due_date'),
 				$db->quoteName('a.published'),
 				$db->quoteName('c.title', 'course_title'),

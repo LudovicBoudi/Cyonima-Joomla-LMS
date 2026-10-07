@@ -30,11 +30,11 @@ class CertificatesModel extends BaseDatabaseModel
 		$user = Factory::getApplication()->getIdentity();
 		$db   = $this->getDatabase();
 
-		return $db->setQuery(
+		$items = $db->setQuery(
 			$db->getQuery(true)
 				->select(
 					[
-						$db->quoteName('cert.*'),
+						$db->quoteName('cert') . '.*',
 						$db->quoteName('c.title', 'course_title'),
 					]
 				)
@@ -44,6 +44,12 @@ class CertificatesModel extends BaseDatabaseModel
 				->bind(':user', $user->id, ParameterType::INTEGER)
 				->order($db->quoteName('cert.issued_date') . ' DESC')
 		)->loadObjectList() ?: [];
+
+		foreach ($items as $item) {
+			$item->file_exists = is_file(JPATH_ROOT . '/' . trim($item->file_path, '/'));
+		}
+
+		return $items;
 	}
 
 	/**

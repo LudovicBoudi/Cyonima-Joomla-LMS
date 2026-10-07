@@ -42,7 +42,7 @@ HTMLHelper::_('behavior.multiselect');
 							<th width="1%"><?php echo HTMLHelper::_('grid.checkall'); ?></th>
 							<th><?php echo Text::_('JGLOBAL_TITLE'); ?></th>
 							<th width="15%"><?php echo Text::_('COM_CYONIMA_COURSE'); ?></th>
-							<th width="10%"><?php echo Text::_('COM_CYONIMA_MAX_SCORE'); ?></th>
+							<th width="10%"><?php echo Text::_('COM_CYONIMA_COEFFICIENT'); ?></th>
 							<th width="15%"><?php echo Text::_('COM_CYONIMA_DUE_DATE'); ?></th>
 							<th width="5%"><?php echo Text::_('JSTATUS'); ?></th>
 							<th width="5%"><?php echo Text::_('JGRID_HEADING_ID'); ?></th>
@@ -56,9 +56,12 @@ HTMLHelper::_('behavior.multiselect');
 									<a href="<?php echo Route::_('index.php?option=com_cyonima&task=assignments.edit&id=' . (int) $item->id); ?>">
 										<?php echo $this->escape($item->title); ?>
 									</a>
+									<div class="small">
+										<a href="<?php echo Route::_('index.php?option=com_cyonima&view=questions&filter_assignment=' . (int) $item->id); ?>"><?php echo Text::_('COM_CYONIMA_QUESTIONS'); ?></a>
+									</div>
 								</td>
 								<td><?php echo $this->escape($item->course_title); ?></td>
-								<td><?php echo (int) $item->max_score; ?></td>
+								<td><?php echo $this->escape($item->coefficient); ?></td>
 								<td><?php echo $this->escape($item->due_date); ?></td>
 								<td><?php echo $item->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?></td>
 								<td><?php echo (int) $item->id; ?></td>
