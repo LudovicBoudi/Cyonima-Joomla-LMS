@@ -16,6 +16,7 @@ use Joomla\CMS\Router\Route;
 $item = $this->item;
 ?>
 
+<?php HTMLHelper::_('behavior.formvalidator'); ?>
 <form action="<?php echo Route::_('index.php?option=com_cyonima&view=course&layout=edit'); ?>" method="post" name="adminForm" id="adminForm" class="form-validate">
 	<div class="row">
 		<div class="col-md-8">

@@ -16,6 +16,7 @@ use Joomla\CMS\Uri\Uri;
 $item = $this->item;
 ?>
 
+<?php HTMLHelper::_('behavior.formvalidator'); ?>
 <form action="<?php echo Route::_('index.php?option=com_cyonima&view=certificatetemplate&layout=edit'); ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 	<fieldset class="options-form">
 		<div class="control-group">
