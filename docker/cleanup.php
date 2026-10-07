@@ -40,4 +40,18 @@ foreach ([
     }
 }
 
+// Stale legacy language files take precedence over the extension language folder
+// and would mask freshly installed strings. Remove them so the dispatcher falls
+// back to the files shipped inside the component.
+foreach ([
+    JPATH_SITE . '/language/en-GB/com_cyonima.ini',
+    JPATH_SITE . '/language/en-GB/com_cyonima.sys.ini',
+    JPATH_ADMINISTRATOR . '/language/en-GB/com_cyonima.ini',
+    JPATH_ADMINISTRATOR . '/language/en-GB/com_cyonima.sys.ini',
+] as $file) {
+    if (is_file($file)) {
+        unlink($file);
+    }
+}
+
 echo "cleaned\n";

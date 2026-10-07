@@ -91,9 +91,41 @@
 }
 
 /* Player */
-.cyonima-video video,
-.cyonima-embed iframe {
+.cyonima-media video,
+.cyonima-media audio,
+.cyonima-media img {
 	max-width: 100%;
+}
+
+.cyonima-media video {
+	display: block;
+	width: 100%;
+	background: #000;
+	border-radius: 8px;
+}
+
+.cyonima-media audio {
+	display: block;
+	width: 100%;
+}
+
+.cyonima-media img {
+	display: block;
+	margin: 0 auto;
+	border: 1px solid #e3e3e3;
+	border-radius: 8px;
+}
+
+.cyonima-media iframe {
+	display: block;
+	width: 100%;
+	min-height: 75vh;
+	border: 1px solid #e3e3e3;
+	border-radius: 8px;
+}
+
+.cyonima-media-actions {
+	margin: 0.5rem 0 0;
 }
 
 .cyonima-embed {

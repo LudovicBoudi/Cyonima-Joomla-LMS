@@ -8,6 +8,7 @@
 
 \defined('_JEXEC') or die;
 
+use Cyonima\Component\Cyonima\Administrator\Helper\CyonimaHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -15,6 +16,36 @@ use Joomla\CMS\Router\Route;
 HTMLHelper::_('stylesheet', 'com_cyonima/cyonima.css', ['version' => 'auto', 'relative' => true]);
 
 $lesson = $this->lesson;
+
+// Media lessons play the picked file, whatever its real type: the player follows the
+// MIME type of the stored file, not only the declared lesson type.
+$mediaUrl  = '';
+$mediaMime = '';
+$player    = '';
+$openLabel = '';
+
+if ($lesson && \in_array($lesson->type, ['video', 'pdf'], true)) {
+	$mediaUrl  = CyonimaHelper::mediaUrl((string) $lesson->media);
+	$mediaMime = $mediaUrl !== '' ? CyonimaHelper::mediaMime($mediaUrl) : '';
+
+	if ($mediaUrl !== '') {
+		if ($mediaMime !== '' && strpos($mediaMime, 'audio/') === 0) {
+			$player = 'audio';
+		} elseif ($mediaMime === 'application/pdf') {
+			$player = 'pdf';
+		} elseif ($mediaMime !== '' && strpos($mediaMime, 'image/') === 0) {
+			$player = 'image';
+		} else {
+			$player = $lesson->type === 'pdf' && $mediaMime === '' ? 'pdf' : 'video';
+		}
+
+		$openLabel = [
+			'audio' => 'COM_CYONIMA_OPEN_AUDIO',
+			'image' => 'COM_CYONIMA_OPEN_IMAGE',
+			'pdf'   => 'COM_CYONIMA_OPEN_PDF',
+		][$player] ?? 'COM_CYONIMA_OPEN_VIDEO';
+	}
+}
 ?>
 
 <div class="cyonima cyonima-lesson-player">
@@ -35,28 +66,48 @@ $lesson = $this->lesson;
 		<p class="cyonima-intro"><?php echo $this->escape($lesson->description); ?></p>
 	<?php endif; ?>
 
-	<?php switch ($lesson->type) : case 'video': ?>
-		<?php if ($lesson->media) : ?>
-			<div class="cyonima-video">
-				<video controls preload="metadata" style="max-width:100%;">
-					<source src="<?php echo $this->escape($lesson->media); ?>" type="video/mp4">
+	<?php if ($player !== '') : ?>
+		<div class="cyonima-media cyonima-media--<?php echo $player; ?>">
+			<?php if ($player === 'audio') : ?>
+				<audio controls preload="metadata" src="<?php echo $this->escape($mediaUrl); ?>"></audio>
+			<?php elseif ($player === 'pdf') : ?>
+				<iframe src="<?php echo $this->escape($mediaUrl); ?>" title="<?php echo $this->escape($lesson->title); ?>" loading="lazy"></iframe>
+			<?php elseif ($player === 'image') : ?>
+				<img src="<?php echo $this->escape($mediaUrl); ?>" alt="<?php echo $this->escape($lesson->title); ?>">
+			<?php else : ?>
+				<video controls preload="metadata" playsinline>
+					<source src="<?php echo $this->escape($mediaUrl); ?>"<?php echo $mediaMime !== '' ? ' type="' . $mediaMime . '"' : ''; ?>>
 					<?php echo Text::_('COM_CYONIMA_VIDEO_UNSUPPORTED'); ?>
 				</video>
-			</div>
-		<?php elseif ($lesson->url) : ?>
-			<div class="cyonima-embed">
-				<iframe src="<?php echo $this->escape($lesson->url); ?>" frameborder="0" allowfullscreen></iframe>
-			</div>
+			<?php endif; ?>
+
+			<p class="cyonima-media-actions">
+				<a class="btn btn-sm btn-outline-secondary" href="<?php echo $this->escape($mediaUrl); ?>" target="_blank" rel="noopener">
+					<?php echo Text::_($openLabel); ?>
+				</a>
+			</p>
+		</div>
+	<?php endif; ?>
+
+	<?php switch ($lesson->type) : case 'video': ?>
+		<?php if ($mediaUrl === '') : ?>
+			<?php if ($lesson->url) : ?>
+				<div class="cyonima-embed">
+					<iframe src="<?php echo $this->escape($lesson->url); ?>" frameborder="0" allowfullscreen></iframe>
+				</div>
+			<?php else : ?>
+				<p class="cyonima-muted"><?php echo Text::_('COM_CYONIMA_NO_MEDIA'); ?></p>
+			<?php endif; ?>
 		<?php endif; ?>
 		<?php break; ?>
 
 	<?php case 'pdf': ?>
-		<?php if ($lesson->media) : ?>
-			<div class="cyonima-pdf">
-				<iframe src="<?php echo $this->escape($lesson->media); ?>" width="100%" height="700px"></iframe>
-			</div>
-		<?php elseif ($lesson->url) : ?>
-			<p><a class="btn btn-primary" target="_blank" rel="noopener" href="<?php echo $this->escape($lesson->url); ?>"><?php echo Text::_('COM_CYONIMA_OPEN_PDF'); ?></a></p>
+		<?php if ($mediaUrl === '') : ?>
+			<?php if ($lesson->url) : ?>
+				<p><a class="btn btn-primary" target="_blank" rel="noopener" href="<?php echo $this->escape($lesson->url); ?>"><?php echo Text::_('COM_CYONIMA_OPEN_PDF'); ?></a></p>
+			<?php else : ?>
+				<p class="cyonima-muted"><?php echo Text::_('COM_CYONIMA_NO_MEDIA'); ?></p>
+			<?php endif; ?>
 		<?php endif; ?>
 		<?php break; ?>
 

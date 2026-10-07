@@ -213,4 +213,95 @@ abstract class CyonimaHelper
 			. '</div>'
 			. '</joomla-field-media>';
 	}
+
+	/**
+	 * Resolves a stored media value into a URL usable as a src/href.
+	 *
+	 * Handles absolute URLs (including the #joomlaImage:// fragment written by the Media
+	 * Manager), paths relative to the site root ("images/videos/lesson.mp4") and paths
+	 * relative to the Media Manager root folder ("videos/lesson.mp4").
+	 *
+	 * @param   string  $media  The stored media value.
+	 *
+	 * @return  string  The URL, or an empty string when no media is set.
+	 */
+	public static function mediaUrl(string $media): string
+	{
+		// Drop anchors and the #joomlaImage://...?width=... fragment appended by the media field.
+		$path = explode('#', trim($media), 2)[0];
+
+		if ($path === '' || preg_match('#\.\.[/\\\\]#', $path)) {
+			return '';
+		}
+
+		// Absolute or protocol relative URL: keep external hosts as is, rebuild same site
+		// URLs from the current base so a domain change does not break the player.
+		if (preg_match('#^(?:[a-z][a-z0-9+.\-]*:)?//#i', $path)) {
+			$uri  = new Uri($path);
+			$root = new Uri(Uri::root());
+
+			if ($uri->getHost() === '' || $uri->getHost() !== $root->getHost()) {
+				return $path;
+			}
+
+			$rootPath = rtrim($root->getPath(), '/');
+			$relPath  = $uri->getPath();
+
+			if ($rootPath !== '' && strpos($relPath, $rootPath . '/') === 0) {
+				$relPath = substr($relPath, \strlen($rootPath));
+			}
+
+			return Uri::root() . ltrim($relPath, '/') . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+		}
+
+		// Already root absolute ("/images/videos/lesson.mp4").
+		if ($path[0] === '/') {
+			return $path;
+		}
+
+		$relPath  = ltrim($path, '/');
+		$mediaRoot = trim((string) ComponentHelper::getParams('com_media')->get('image_path', 'images'), '/');
+
+		// Relative to the site root, or already prefixed with the Media Manager root folder.
+		if ($mediaRoot === '' || strpos($relPath, $mediaRoot . '/') === 0 || is_file(JPATH_ROOT . '/' . $relPath)) {
+			return Uri::root() . $relPath;
+		}
+
+		// Relative to the Media Manager root folder ("videos/lesson.mp4").
+		return Uri::root() . $mediaRoot . '/' . $relPath;
+	}
+
+	/**
+	 * Guesses the MIME type of a media URL from its file extension.
+	 *
+	 * @param   string  $url  The media URL.
+	 *
+	 * @return  string  The MIME type, or an empty string when it cannot be guessed.
+	 */
+	public static function mediaMime(string $url): string
+	{
+		$path = (string) (parse_url($url, \PHP_URL_PATH) ?: '');
+		$ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+		$map = [
+			'pdf'  => 'application/pdf',
+			'jpg'  => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+			'png'  => 'image/png',
+			'gif'  => 'image/gif',
+			'webp' => 'image/webp',
+			'svg'  => 'image/svg+xml',
+			'mp4'  => 'video/mp4',
+			'm4v'  => 'video/mp4',
+			'webm' => 'video/webm',
+			'ogv'  => 'video/ogg',
+			'mov'  => 'video/quicktime',
+			'mp3'  => 'audio/mpeg',
+			'm4a'  => 'audio/mp4',
+			'oga'  => 'audio/ogg',
+			'wav'  => 'audio/wav',
+		];
+
+		return $map[$ext] ?? '';
+	}
 }

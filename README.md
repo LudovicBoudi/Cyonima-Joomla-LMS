@@ -21,6 +21,7 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 - [Architecture](#architecture)
 - [Modèle de données](#modèle-de-données)
 - [Développement](#développement)
+- [Historique des changements](#historique-des-changements)
 
 ---
 
@@ -28,7 +29,7 @@ L'administration des **comptes utilisateurs reste déléguée à Joomla** : le c
 
 - **Cours** avec description riche, image, publication, accès et langue.
 - **Curriculum structuré** : un cours se compose de **sections** ordonnées ; le teacher crée les leçons, devoirs et examens directement depuis la page « Curriculum » du cours, les réordonne, les renomme et les supprime. Le contenu s'affiche côté student **regroupé par section**.
-- **Leçons** de 6 types : contenu riche (`content`), vidéo (`video`), PDF (`pdf`), lien externe (`link`), devoir (`assignment`) et examen (`exam`).
+- **Leçons** de 6 types : contenu riche (`content`), vidéo (`video`), PDF (`pdf`), lien externe (`link`), devoir (`assignment`) et examen (`exam`). Les leçons `video` et `pdf` intègrent un **lecteur HTML5** pour les fichiers locaux (vidéo, audio, PDF, image) sélectionnés via le gestionnaire de médias, avec un lien de secours « ouvrir dans un nouvel onglet ».
 - **Devoirs QCM notés automatiquement** : questions à choix unique, multiples ou vrai/faux, points par question, coefficient, nombre de tentatives autorisées.
 - **Examens formels** : mêmes types de questions, barème, note de passage, temps limite, coefficient, nombre de tentatives, mélange des questions.
 - **Note globale de formation** : moyenne pondérée des devoirs et examens selon leur coefficient, affichée au student (cours + tableau de bord) et au teacher (monitor).
@@ -160,8 +161,8 @@ Les permissions du composant (`core.manage`, etc.) lui sont déjà attribuées :
    Chaque item se déplace (↑/↓), s'édite et se supprime (suppression en cascade de la leçon, du devoir/examen, de ses questions et tentatives). Supprimer une section fait repasser ses contenus dans « No section » — aucune leçon n'est supprimée. Les leçons créées avant l'ajout de sections se retrouvent aussi dans « No section ».
 3. **Ajouter des leçons** : depuis la liste des cours (lien « Lessons »), depuis la fiche d'un cours enregistré (lien **« Manage lessons »**, qui ouvre la liste filtrée sur ce cours), ou via le menu Lessons. Le bouton « New » d'une liste filtrée ouvre la fiche leçon avec le cours déjà sélectionné. Choisir le type de leçon :
    - `content` : contenu HTML ;
-   - `video` : fichier vidéo (MP4) ou URL d'iframe (YouTube, Vimeo…) ;
-   - `pdf` : chemin du fichier PDF ;
+   - `video` : fichier vidéo local (MP4/WebM…, lu dans le **lecteur intégré**) ou URL d'iframe (YouTube, Vimeo…) ;
+   - `pdf` : fichier PDF local (affiché dans une **visionneuse intégrée**) ou lien vers un PDF ;
    - `link` : lien externe ;
    - `assignment` : à relier à un devoir (menu Assignments) ;
    - `exam` : à relier à un examen (menu Exams).
@@ -327,6 +328,23 @@ php -r 'foreach (["com_cyonima/cyonima.xml","com_cyonima/admin/access.xml","com_
 - Intégration `com_categories` pour catégoriser les cours.
 - Versioning / historique (l'interface `VersionableTableInterface` est déjà déclarée sur `CourseTable`).
 - Traductions supplémentaires (seul `en-GB` est fourni).
+
+---
+
+## Historique des changements
+
+### 2026-10-07 — Lecteur média intégré & correctifs
+
+- **Lecteur HTML5 pour les médias locaux** : les leçons `video` et `pdf` affichent désormais un lecteur intégré au lieu d'un simple lien. Le composant joue le fichier local sélectionné dans le gestionnaire de médias, quel que soit son type réel :
+  - vidéo → `<video controls playsinline>` ;
+  - audio → `<audio controls>` ;
+  - PDF → visionneuse `<iframe>` pleine largeur ;
+  - image → `<img>` ;
+  - un lien « ouvrir dans un nouvel onglet » est toujours proposé sous le lecteur, et un message clair s'affiche quand aucun média n'est renseigné.
+- **Résolution des URLs média** (`CyonimaHelper::mediaUrl()`) : les valeurs stockées par le sélecteur de médias sont normalisées en URL absolue — chemin relatif au site (`images/videos/foo.mp4`), fragment `#joomlaImage://…?width=…`, URL absolue (reconstruite depuis la base courante en cas de changement de domaine), ou chemin relatif au dossier média (`videos/foo.mp4`).
+- **Type MIME** (`CyonimaHelper::mediaMime()`) : déduit le `content-type` de l'extension, utilisé pour l'attribut `type` de la source vidéo.
+- **Correctif langue** : un fichier obsolète `language/en-GB/com_cyonima.ini` (hérité d'une installation antérieure) masquait les chaînes embarquées dans le composant, `ComponentDispatcher` chargeant en priorité `JPATH_BASE/language/…`. Le fichier est supprimé et `docker/cleanup.php` le purge désormais à chaque réinstallation.
+- **Couverture de test** : ajout d'une suite E2E dédiée au lecteur (20 contrôles : vidéo, PDF, fragment, URL absolue, embed externe, leçon vide, `content-type` des fichiers servis).
 
 ---
 
